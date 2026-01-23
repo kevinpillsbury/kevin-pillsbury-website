@@ -5,7 +5,7 @@ export default function Home() {
         Kevin Pillsbury
       </h1>
       <p className="text-xl text-gray-500">
-        Writer. Developer. Student.
+        Writer. Developer.
       </p>
     </div>
   );
