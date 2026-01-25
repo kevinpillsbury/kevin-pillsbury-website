@@ -15,17 +15,12 @@ export default async function Home() {
         title: 'asc'
       }
     });
-    
-    console.log(`Successfully fetched ${compositions.length} compositions`);
   } catch (error) {
     // Log detailed error information (visible in Vercel function logs)
     console.error('Error fetching compositions:', error);
     
     if (error instanceof Error) {
       errorMessage = error.message;
-      console.error('Error name:', error.name);
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
     }
     
     // Return empty array on error so the page still renders
