@@ -1,6 +1,9 @@
 import prisma from '../lib/prisma';
 import { Composition } from '../generated/prisma/client';
 
+// Force dynamic rendering to avoid build-time database connection
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const compositions = await prisma.composition.findMany();
 
