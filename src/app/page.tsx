@@ -6,13 +6,39 @@ export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   let compositions: Composition[] = [];
+  let errorMessage: string | null = null;
   
   try {
-    compositions = await prisma.composition.findMany();
+    // Test the connection first
+    await prisma.$connect();
+    
+    // Fetch compositions
+    compositions = await prisma.composition.findMany({
+      orderBy: {
+        title: 'asc'
+      }
+    });
+    
+    console.log(`Successfully fetched ${compositions.length} compositions`);
   } catch (error) {
-    // Log errors for debugging (visible in Vercel function logs)
+    // Log detailed error information (visible in Vercel function logs)
     console.error('Error fetching compositions:', error);
+    
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
+    
     // Return empty array on error so the page still renders
+  } finally {
+    // Disconnect to avoid connection leaks
+    try {
+      await prisma.$disconnect();
+    } catch (disconnectError) {
+      // Ignore disconnect errors
+    }
   }
 
   return (
@@ -26,7 +52,14 @@ export default async function Home() {
 
       <section className="mt-12 w-full max-w-2xl">
         <h2 className="text-3xl font-semibold mb-6 text-center">My Compositions</h2>
-        {compositions.length === 0 ? (
+        {errorMessage && (
+          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            <p className="font-bold">Database Error:</p>
+            <p className="text-sm">{errorMessage}</p>
+            <p className="text-xs mt-2">Check Vercel function logs for more details.</p>
+          </div>
+        )}
+        {compositions.length === 0 && !errorMessage ? (
           <p className="text-center text-gray-600">No compositions found. Add some in Prisma Studio!</p>
         ) : (
           <div className="space-y-8">
