@@ -9,10 +9,7 @@ export default async function Home() {
   let errorMessage: string | null = null;
   
   try {
-    // Test the connection first
-    await prisma.$connect();
-    
-    // Fetch compositions
+    // Fetch compositions - Prisma will handle connection automatically
     compositions = await prisma.composition.findMany({
       orderBy: {
         title: 'asc'
@@ -32,13 +29,6 @@ export default async function Home() {
     }
     
     // Return empty array on error so the page still renders
-  } finally {
-    // Disconnect to avoid connection leaks
-    try {
-      await prisma.$disconnect();
-    } catch (disconnectError) {
-      // Ignore disconnect errors
-    }
   }
 
   return (
