@@ -8,21 +8,10 @@ export default async function Home() {
   let compositions: Composition[] = [];
   
   try {
-    // Add logging to debug
-    console.log('Fetching compositions from database...');
     compositions = await prisma.composition.findMany();
-    console.log(`Found ${compositions.length} compositions`);
-    
-    // Also try a count query to verify connection
-    const count = await prisma.composition.count();
-    console.log(`Total compositions in database: ${count}`);
   } catch (error) {
+    // Log errors for debugging (visible in Vercel function logs)
     console.error('Error fetching compositions:', error);
-    // Log the full error details
-    if (error instanceof Error) {
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
-    }
     // Return empty array on error so the page still renders
   }
 
