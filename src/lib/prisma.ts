@@ -13,6 +13,8 @@ function getPrismaClient(): PrismaClient {
   // Get DATABASE_URL at runtime, not at module load time
   const connectionString = process.env.DATABASE_URL
 
+  console.log('DATABASE_URL:', connectionString);
+
   if (!connectionString) {
     throw new Error('DATABASE_URL environment variable is not set. Please check your Vercel environment variables.')
   }
