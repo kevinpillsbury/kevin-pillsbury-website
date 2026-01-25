@@ -5,7 +5,14 @@ import { Composition } from '../generated/prisma/client';
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const compositions = await prisma.composition.findMany();
+  let compositions: Composition[] = [];
+  
+  try {
+    compositions = await prisma.composition.findMany();
+  } catch (error) {
+    console.error('Error fetching compositions:', error);
+    // Return empty array on error so the page still renders
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-24">
