@@ -1,5 +1,5 @@
 import prisma from '../lib/prisma';
-import { Composition } from '@prisma/client';
+import { Composition } from '../generated/prisma/client';
 
 export default async function Home() {
   const compositions = await prisma.composition.findMany();
