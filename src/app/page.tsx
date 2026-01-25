@@ -1,4 +1,5 @@
 import prisma from '../lib/prisma';
+import { Composition } from '@prisma/client';
 
 export default async function Home() {
   const compositions = await prisma.composition.findMany();
@@ -18,7 +19,7 @@ export default async function Home() {
           <p className="text-center text-gray-600">No compositions found. Add some in Prisma Studio!</p>
         ) : (
           <div className="space-y-8">
-            {compositions.map((composition) => (
+            {compositions.map((composition: Composition) => (
               <article key={composition.id} className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-2xl font-bold text-gray-800">{composition.title}</h3>
                 <p className="text-md text-gray-500 mb-2">{composition.genre}</p>
