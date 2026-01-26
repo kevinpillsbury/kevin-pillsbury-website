@@ -13,7 +13,7 @@ export const revalidate = 3600;
 
 // Pre-build these pages at build time
 export async function generateStaticParams() {
-  const genres = ['fiction', 'poems', 'essays', 'drama'];
+  const genres = ['fiction', 'poem', 'essay', 'drama'];
   return genres.map((genre) => ({
     genre: genre,
   }));
