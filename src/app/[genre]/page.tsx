@@ -68,7 +68,7 @@ export default async function GenrePage({ params }: GenrePageProps) {
 
   return (
     <div className="w-full">
-      <h1 className="text-3xl font-bold mb-8 capitalize text-left">{formattedGenre}</h1>
+      <h1 className="text-4xl sm:text-5xl font-bold mb-8 capitalize text-left text-white">{formattedGenre}</h1>
       <GenreView compositions={compositions} />
     </div>
   );
