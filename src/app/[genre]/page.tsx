@@ -3,9 +3,9 @@ import GenreView from '../../components/GenreView';
 import { notFound } from 'next/navigation';
 
 interface GenrePageProps {
-  params: {
+  params: Promise<{
     genre: string;
-  };
+  }>;
 }
 
 // Revalidate every hour
@@ -45,7 +45,7 @@ async function getCompositionsByGenre(genre: string) {
 }
 
 export default async function GenrePage({ params }: GenrePageProps) {
-  const { genre } = params;
+  const { genre } = await params;
 
   // Guard against invalid or missing genre params
   if (typeof genre !== 'string') {
