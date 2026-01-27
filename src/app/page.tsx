@@ -5,12 +5,6 @@ export default function Home() {
         <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl font-serif">
           Kevin Pillsbury
         </h1>
-        <p className="mt-6 text-lg leading-8 text-gray-600">
-          Computer Science Major & Creative Writing Minor
-        </p>
-        <p className="text-md leading-8 text-gray-500">
-          Hamilton College, Class of 2026
-        </p>
       </div>
     </div>
   );
