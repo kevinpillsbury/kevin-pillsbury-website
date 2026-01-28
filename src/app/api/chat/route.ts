@@ -1,10 +1,14 @@
+import 'dotenv/config';
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import prisma from '@/lib/prisma';
 import { CHATBOT_ROLE } from '@/lib/chatbot-config';
 
 const RATE_LIMIT_MESSAGE =
-  "Woah! You've got a lot of questions. I'm not even sure Kevin could answer this fast. Give me a second though and I'll see if I can wake him up.";
+  "Woah! You've got a lot of questions. I'm not even sure Kev could answer this fast. Give me a second though and I'll see if I can find him for you.";
+
+const NO_API_KEY_MESSAGE =
+  'Chat is not configured. Set GEMINI_API_KEY in .env (or .env.local) and restart the dev server.';
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
 
@@ -12,8 +16,9 @@ export async function POST(req: Request) {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
+      console.warn('[chat] Missing GEMINI_API_KEY. Add it to .env or .env.local and restart.');
       return NextResponse.json(
-        { error: 'Chat is not configured.' },
+        { error: NO_API_KEY_MESSAGE },
         { status: 500 }
       );
     }

@@ -15,6 +15,8 @@ type ChatContextValue = {
   messages: ChatMessage[];
   isLoading: boolean;
   error: string | null;
+  isMinimized: boolean;
+  setIsMinimized: (value: boolean) => void;
   currentGenre: string | null;
   currentCompositionId: string | null;
   currentCompositionTitle: string | null;
@@ -33,6 +35,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isMinimized, setIsMinimized] = useState(true);
   const [currentGenre, setCurrentGenre] = useState<string | null>(null);
   const [currentCompositionId, setCurrentCompositionId] = useState<
     string | null
@@ -109,6 +112,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     messages,
     isLoading,
     error,
+    isMinimized,
+    setIsMinimized,
     currentGenre,
     currentCompositionId,
     currentCompositionTitle,
