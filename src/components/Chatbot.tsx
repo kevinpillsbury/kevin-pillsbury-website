@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useChat } from '@/lib/chat-context';
 
 const WELCOME =
-  "Hi! I'm Kev's personal assistant. He's currenlty busy being up to no good, but I'd be happy to answer your questions in the meantimet!";
+  "Hi! I'm Kev's personal assistant. He's currenlty busy being up to no good, but I'd be happy to answer your questions in the meantime!";
 const MINIMIZED_LABEL = 'Questions about my writing?';
 
 export function MinimizedChatButton() {
