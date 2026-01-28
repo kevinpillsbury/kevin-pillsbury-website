@@ -45,7 +45,7 @@ export default function GenreView({ compositions, displayGenre }: GenreViewProps
 
   return (
     <div className="h-full min-h-0 overflow-hidden">
-      <div className="grid h-full min-h-0 grid-cols-1 gap-10 md:grid-cols-[120px_minmax(0,1fr)_160px] lg:grid-cols-[130px_minmax(0,1fr)_170px]">
+      <div className="grid h-full min-h-0 grid-cols-1 gap-10 md:grid-cols-[240px_minmax(0,1fr)_320px] lg:grid-cols-[260px_minmax(0,1fr)_340px]">
         {/* Left column: genre title + compositions list (independently scrollable) */}
         <aside className="min-h-0 overflow-hidden">
           <div className="flex h-full min-h-0 flex-col">
