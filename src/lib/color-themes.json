@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Dark",
+    "background": "#050505",
+    "text-borders": "#e7c9a2",
+    "bubbles": "#5a160c"
+  },
+
+  {
+    "name": "Light",
+    "background": "#faecbe",
+    "text-borders": "#000000",
+    "bubbles": "#d9faeb"
+  },
+
+  {
+    "name": "E&A",
+    "background": "#faecbe",
+    "text-borders": "#FFFFFF",
+    "bubbles": "#99aebd"
+  }
+]
+

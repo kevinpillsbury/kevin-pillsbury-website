@@ -15,9 +15,9 @@ export function MinimizedChatButton({ className }: { className?: string }) {
       type="button"
       onClick={() => setIsMinimized(false)}
       className={[
-        'px-6 py-5 rounded-2xl bg-[var(--panel)] border-2 border-[var(--border)]',
-        'text-[var(--foreground)] font-serif text-lg leading-tight text-center',
-        'hover:bg-[var(--panel-2)] focus:outline-none focus:ring-2 focus:ring-[var(--border)]/60',
+        'px-6 py-5 rounded-2xl bg-[var(--bubbles)] border-2 border-[var(--text-borders)]',
+        'text-[var(--text-borders)] font-serif text-lg leading-tight text-center',
+        'hover:bg-[var(--bubbles)] focus:outline-none focus:ring-2 focus:ring-[var(--text-borders)]/60',
         'max-w-full w-[280px]',
         className ?? '',
       ].join(' ')}
@@ -66,12 +66,12 @@ export function ChatPanel() {
     !hasShownWelcome && messages.length === 0;
 
   return (
-    <div className="flex h-full min-h-0 flex-col rounded-[2.25rem] border-2 border-[var(--border)] bg-[var(--panel)] overflow-hidden">
-      <header className="shrink-0 border-b-2 border-[var(--border)] bg-[var(--panel-2)] px-4 py-2">
+    <div className="flex h-full min-h-0 flex-col rounded-[2.25rem] border-2 border-[var(--text-borders)] bg-[var(--bubbles)] overflow-hidden">
+      <header className="shrink-0 border-b-2 border-[var(--text-borders)] bg-[var(--bubbles)] px-4 py-2">
         <button
           type="button"
           onClick={onMinimize}
-          className="w-full text-center font-serif text-sm text-[var(--foreground)] hover:underline focus:outline-none"
+          className="w-full text-center font-serif text-sm text-[var(--text-borders)] hover:underline focus:outline-none"
           aria-label="Minimize chat"
         >
           Minimize chat
@@ -83,7 +83,7 @@ export function ChatPanel() {
       >
         {showWelcome && (
           <div className="flex justify-start">
-            <div className="max-w-[90%] rounded-2xl bg-[var(--surface)] border border-[var(--border)] px-4 py-3 font-serif text-base text-[var(--foreground)]">
+            <div className="max-w-[90%] rounded-2xl bg-[var(--background)] border border-[var(--text-borders)] px-4 py-3 font-serif text-base text-[var(--text-borders)]">
               {WELCOME}
             </div>
           </div>
@@ -96,8 +96,8 @@ export function ChatPanel() {
             <div
               className={`max-w-[90%] rounded-2xl px-4 py-3 font-serif text-base border ${
                 m.role === 'user'
-                  ? 'bg-[var(--surface)] border-[var(--border)] text-[var(--foreground)]'
-                  : 'bg-[var(--surface)] border-[var(--border)] text-[var(--foreground)]'
+                  ? 'bg-[var(--background)] border-[var(--text-borders)] text-[var(--text-borders)]'
+                  : 'bg-[var(--background)] border-[var(--text-borders)] text-[var(--text-borders)]'
               }`}
             >
               <p className="whitespace-pre-wrap">{m.content}</p>
@@ -106,7 +106,7 @@ export function ChatPanel() {
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="max-w-[90%] rounded-2xl bg-[var(--surface)] border border-[var(--border)] px-4 py-3 font-serif text-base text-[var(--foreground)]">
+            <div className="max-w-[90%] rounded-2xl bg-[var(--background)] border border-[var(--text-borders)] px-4 py-3 font-serif text-base text-[var(--text-borders)]">
               …
             </div>
           </div>
@@ -126,20 +126,20 @@ export function ChatPanel() {
       )}
       <form
         onSubmit={handleSubmit}
-        className="shrink-0 flex items-stretch border-t-2 border-[var(--border)] bg-[var(--panel-2)]"
+        className="shrink-0 flex items-stretch border-t-2 border-[var(--text-borders)] bg-[var(--bubbles)]"
       >
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask your questions here!"
-          className="min-w-0 flex-1 bg-transparent px-5 py-4 font-serif text-base text-[var(--foreground)] placeholder-[var(--foreground)]/70 focus:outline-none"
+          className="min-w-0 flex-1 bg-transparent px-5 py-4 font-serif text-base text-[var(--text-borders)] placeholder-[var(--text-borders)]/70 focus:outline-none"
           disabled={isLoading}
         />
         <button
           type="submit"
           disabled={isLoading || !input.trim()}
-          className="shrink-0 border-l-2 border-[var(--border)] px-5 py-4 font-serif text-2xl text-[var(--foreground)] hover:bg-[var(--panel)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
+          className="shrink-0 border-l-2 border-[var(--text-borders)] px-5 py-4 font-serif text-2xl text-[var(--text-borders)] hover:bg-[var(--bubbles)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
         >
           →
         </button>

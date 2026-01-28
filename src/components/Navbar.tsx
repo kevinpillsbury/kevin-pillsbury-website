@@ -3,62 +3,99 @@
 import * as React from "react";
 import Link from "next/link";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { useTheme } from "@/lib/theme-context";
 
 const Navbar = () => {
+  const { themes, activeTheme, setActiveThemeByName } = useTheme();
   return (
-    <nav className="sticky top-0 z-50 bg-[var(--background)] border-b border-[var(--border)]">
-      <div className="max-w-5xl mx-auto pl-2 pr-4 sm:pl-2 sm:pr-6 lg:pl-3 lg:pr-8">
+    <nav className="sticky top-0 z-50 bg-[var(--background)] border-b border-[var(--text-borders)]">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-start h-16">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="px-4 py-2 rounded-md text-sm font-medium text-[var(--foreground)] hover:bg-[var(--panel-2)] border border-[var(--border)] focus:outline-none"
-            >
-              Home
-            </Link>
+          <div className="flex w-full items-center justify-between">
+            <div className="flex items-center gap-6">
+              <span className="font-serif text-lg text-[var(--text-borders)]">
+              Kevin Pillsbury
+              </span>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/"
+                  className="px-4 py-2 rounded-md text-sm font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] border border-[var(--text-borders)] focus:outline-none"
+                >
+                  Home
+                </Link>
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger asChild>
+                    <button className="px-4 py-2 rounded-md text-sm font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] border border-[var(--text-borders)] focus:outline-none">
+                      <span>Writing</span>
+                    </button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Portal>
+                    <DropdownMenu.Content
+                      className="mt-2 w-64 min-w-[16rem] bg-[var(--background)] rounded-md shadow-lg ring-1 ring-[var(--text-borders)] border border-[var(--text-borders)] focus:outline-none py-2"
+                      sideOffset={5}
+                    >
+                      <DropdownMenu.Item asChild>
+                        <Link
+                          href="/fiction"
+                          className="block px-5 py-3 text-base text-[var(--text-borders)] hover:bg-[var(--bubbles)]"
+                        >
+                          Fiction
+                        </Link>
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item asChild>
+                        <Link
+                          href="/poetry"
+                          className="block px-5 py-3 text-base text-[var(--text-borders)] hover:bg-[var(--bubbles)]"
+                        >
+                          Poetry
+                        </Link>
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item asChild>
+                        <Link
+                          href="/essays"
+                          className="block px-5 py-3 text-base text-[var(--text-borders)] hover:bg-[var(--bubbles)]"
+                        >
+                          Essays
+                        </Link>
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item asChild>
+                        <Link
+                          href="/drama"
+                          className="block px-5 py-3 text-base text-[var(--text-borders)] hover:bg-[var(--bubbles)]"
+                        >
+                          Drama
+                        </Link>
+                      </DropdownMenu.Item>
+                    </DropdownMenu.Content>
+                  </DropdownMenu.Portal>
+                </DropdownMenu.Root>
+              </div>
+            </div>
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
-                <button className="px-4 py-2 rounded-md text-sm font-medium text-[var(--foreground)] hover:bg-[var(--panel-2)] border border-[var(--border)] focus:outline-none">
-                  <span>Writing</span>
+                <button className="px-4 py-2 rounded-md text-sm font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] border border-[var(--text-borders)] focus:outline-none">
+                  <span>Color theme</span>
                 </button>
               </DropdownMenu.Trigger>
               <DropdownMenu.Portal>
                 <DropdownMenu.Content
-                  className="mt-2 w-64 min-w-[16rem] bg-[var(--background)] rounded-md shadow-lg ring-1 ring-[var(--border)] border border-[var(--border)] focus:outline-none py-2"
+                  className="mt-2 w-64 min-w-[16rem] bg-[var(--background)] rounded-md shadow-lg ring-1 ring-[var(--text-borders)] border border-[var(--text-borders)] focus:outline-none py-2"
                   sideOffset={5}
+                  align="end"
                 >
-                  <DropdownMenu.Item asChild>
-                    <Link
-                      href="/fiction"
-                      className="block px-5 py-3 text-base text-[var(--foreground)] hover:bg-[var(--panel-2)]"
-                    >
-                      Fiction
-                    </Link>
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item asChild>
-                    <Link
-                      href="/poetry"
-                      className="block px-5 py-3 text-base text-[var(--foreground)] hover:bg-[var(--panel-2)]"
-                    >
-                      Poetry
-                    </Link>
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item asChild>
-                    <Link
-                      href="/essays"
-                      className="block px-5 py-3 text-base text-[var(--foreground)] hover:bg-[var(--panel-2)]"
-                    >
-                      Essays
-                    </Link>
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item asChild>
-                    <Link
-                      href="/drama"
-                      className="block px-5 py-3 text-base text-[var(--foreground)] hover:bg-[var(--panel-2)]"
-                    >
-                      Drama
-                    </Link>
-                  </DropdownMenu.Item>
+                  {themes.map((t) => (
+                    <DropdownMenu.Item key={t.name} asChild>
+                      <button
+                        type="button"
+                        onClick={() => setActiveThemeByName(t.name)}
+                        className={`block w-full text-left px-5 py-3 text-base text-[var(--text-borders)] hover:bg-[var(--bubbles)] ${
+                          t.name === activeTheme.name ? "opacity-100" : "opacity-80"
+                        }`}
+                      >
+                        {t.name}
+                      </button>
+                    </DropdownMenu.Item>
+                  ))}
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>
             </DropdownMenu.Root>
