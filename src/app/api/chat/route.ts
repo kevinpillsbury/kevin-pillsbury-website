@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma';
 import { CHATBOT_ROLE } from '@/lib/chatbot-config';
 
 const RATE_LIMIT_MESSAGE =
-  "Woah! You've got a lot of questions. I'm not even sure Kev could answer this fast. Give me a second though and I'll see if I can find him for you.";
+  "Woah! You've got a lot of questions. I'm not even sure Boss Kevin could answer this fast. Give me a second though and I'll see if I can find him for you.";
 
 const OVERLOADED_MESSAGE =
   "I'm answering someone else's question real quick, I'll be right back with you!";
