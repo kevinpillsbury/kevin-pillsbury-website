@@ -77,7 +77,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     if (hasGreeted || hist.length > 0) return;
 
     const prompt =
-      "There is a user here who wants to ask you questions---greet them! In your greeting give a heoric and/or genius activity that Kev is currently doing as an excuse for why he's not available to answer the user's questions. Finally, offer your assistance to answer the user's questions. Stick to the role you've been given!";
+      "There is a user here who wants to ask you questions---greet them and introduce yourself! In your greeting give a heoric and/or genius activity that Boss Kevin is currently doing as an excuse for why he's not available to answer the user's questions. Finally, offer your assistance to answer the user's questions. Stick to the role you've been given!";
 
     setError(null);
     setIsLoading(true);
