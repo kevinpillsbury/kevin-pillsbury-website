@@ -7,8 +7,14 @@ import { CHATBOT_ROLE } from '@/lib/chatbot-config';
 const RATE_LIMIT_MESSAGE =
   "Woah! You've got a lot of questions. I'm not even sure Kev could answer this fast. Give me a second though and I'll see if I can find him for you.";
 
+const OVERLOADED_MESSAGE =
+  "I'm answering someone else's question real quick, I'll be right back with you!";
+
 const NO_API_KEY_MESSAGE =
   'Chat is not configured. Set GEMINI_API_KEY in .env (or .env.local) and restart the dev server.';
+
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 1500;
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
 
@@ -86,14 +92,26 @@ ${compositionsBlob}`;
     contents.push({ role: 'user', parts: [{ text: message }] });
 
     const ai = new GoogleGenAI({ apiKey });
-    const res = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents,
-      config: { systemInstruction },
-    });
-
-    const text = res.text ?? '';
-    return NextResponse.json({ text });
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        const res = await ai.models.generateContent({
+          model: 'gemini-2.5-flash-lite',
+          contents,
+          config: { systemInstruction },
+        });
+        const text = res.text ?? '';
+        return NextResponse.json({ text });
+      } catch (e) {
+        const status = (e as { status?: number })?.status;
+        const msg = String((e as { message?: string })?.message ?? '');
+        const isRetryable =
+          status === 503 ||
+          status === 429 ||
+          /overloaded|unavailable|resource.?exhausted|quota.?exceeded/i.test(msg);
+        if (!isRetryable || attempt === MAX_RETRIES - 1) throw e;
+        await new Promise((r) => setTimeout(r, RETRY_DELAY_MS * (attempt + 1)));
+      }
+    }
   } catch (err: unknown) {
     // Log the full error so we can debug
     console.error('[chat] Error:', err);
@@ -105,17 +123,24 @@ ${compositionsBlob}`;
     const isRateLimit =
       status === 429 ||
       /resource.?exhausted|quota.?exceeded/i.test(errMessage);
-    
+    const isOverloaded =
+      status === 503 || /overloaded|unavailable/i.test(errMessage);
+
     if (isRateLimit) {
       return NextResponse.json(
         { error: RATE_LIMIT_MESSAGE },
         { status: 429 }
       );
     }
+    if (isOverloaded) {
+      return NextResponse.json(
+        { error: OVERLOADED_MESSAGE },
+        { status: 503 }
+      );
+    }
 
-    // Return the actual error message for debugging (you can make this generic later)
     return NextResponse.json(
-      { error: `API Error: ${errMessage || 'Something went wrong. Please try again.'}` },
+      { error: errMessage || 'Something went wrong. Please try again.' },
       { status: 500 }
     );
   }
