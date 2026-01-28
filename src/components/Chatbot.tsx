@@ -3,8 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useChat } from '@/lib/chat-context';
 
-const WELCOME =
-  "Hi! I'm Kev's personal assistant. He's currenlty busy being up to no good, but I'd be happy to answer your questions in the meantime!";
 const MINIMIZED_LABEL_TOP = 'Questions about my writing?';
 const MINIMIZED_LABEL_BOTTOM = 'Ask me here!';
 
@@ -35,35 +33,35 @@ export function ChatPanel() {
     isLoading,
     error,
     sendMessage,
+    ensureGreeting,
     clearError,
     setIsMinimized,
   } = useChat();
-  const [hasShownWelcome, setHasShownWelcome] = useState(false);
   const [input, setInput] = useState('');
   const listRef = useRef<HTMLDivElement>(null);
 
   const onMinimize = useCallback(() => {
-    if (!hasShownWelcome) setHasShownWelcome(true);
     setIsMinimized(true);
-  }, [hasShownWelcome, setIsMinimized]);
+  }, [setIsMinimized]);
 
   useEffect(() => {
     listRef.current?.scrollTo(0, listRef.current.scrollHeight);
   }, [messages, isLoading]);
 
+  useEffect(() => {
+    // Generate a unique greeting once at the start of the session.
+    ensureGreeting();
+  }, [ensureGreeting]);
+
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
       if (!input.trim() || isLoading) return;
-      if (!hasShownWelcome) setHasShownWelcome(true);
       sendMessage(input);
       setInput('');
     },
-    [input, isLoading, sendMessage, hasShownWelcome]
+    [input, isLoading, sendMessage]
   );
-
-  const showWelcome =
-    !hasShownWelcome && messages.length === 0;
 
   return (
     <div className="flex h-full min-h-0 flex-col rounded-[2.25rem] border-2 border-[var(--text-borders)] bg-[var(--bubbles)] overflow-hidden">
@@ -81,13 +79,6 @@ export function ChatPanel() {
         ref={listRef}
         className="min-h-0 flex-1 overflow-y-auto px-4 py-4 space-y-4"
       >
-        {showWelcome && (
-          <div className="flex justify-start">
-            <div className="max-w-[90%] rounded-2xl bg-[var(--background)] border border-[var(--text-borders)] px-4 py-3 font-serif text-base text-[var(--text-borders)]">
-              {WELCOME}
-            </div>
-          </div>
-        )}
         {messages.map((m, i) => (
           <div
             key={i}
