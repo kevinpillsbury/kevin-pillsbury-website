@@ -5,27 +5,31 @@ import { useChat } from '@/lib/chat-context';
 
 const WELCOME =
   "Hi! I'm Kev's personal assistant. He's currenlty busy being up to no good, but I'd be happy to answer your questions in the meantime!";
-const MINIMIZED_LABEL = 'Questions about my writing?';
+const MINIMIZED_LABEL_TOP = 'Questions about my writing?';
+const MINIMIZED_LABEL_BOTTOM = 'Ask me here!';
 
-export function MinimizedChatButton() {
+export function MinimizedChatButton({ className }: { className?: string }) {
   const { setIsMinimized } = useChat();
   return (
     <button
       type="button"
       onClick={() => setIsMinimized(false)}
-      className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg bg-gray-800 border border-blue-500 text-white text-sm font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      className={[
+        'px-6 py-5 rounded-2xl bg-[var(--panel)] border-2 border-[var(--border)]',
+        'text-[var(--foreground)] font-serif text-lg leading-tight text-center',
+        'hover:bg-[var(--panel-2)] focus:outline-none focus:ring-2 focus:ring-[var(--border)]/60',
+        'max-w-full w-[280px]',
+        className ?? '',
+      ].join(' ')}
       aria-label="Open chat"
     >
-      {MINIMIZED_LABEL}
+      <div>{MINIMIZED_LABEL_TOP}</div>
+      <div className="mt-1">{MINIMIZED_LABEL_BOTTOM}</div>
     </button>
   );
 }
 
-type ChatPanelProps = {
-  genre: string | null;
-};
-
-export function ChatPanel({ genre }: ChatPanelProps) {
+export function ChatPanel() {
   const {
     messages,
     isLoading,
@@ -62,25 +66,24 @@ export function ChatPanel({ genre }: ChatPanelProps) {
     !hasShownWelcome && messages.length === 0;
 
   return (
-    <div className="flex h-full min-h-0 flex-col rounded-lg border border-blue-500 bg-gray-900">
-      <header className="flex shrink-0 items-center justify-between border-b border-blue-500 px-3 py-2">
-        <span className="text-sm font-medium text-white">Chat</span>
+    <div className="flex h-full min-h-0 flex-col rounded-[2.25rem] border-2 border-[var(--border)] bg-[var(--panel)] overflow-hidden">
+      <header className="shrink-0 border-b-2 border-[var(--border)] bg-[var(--panel-2)] px-4 py-2">
         <button
           type="button"
           onClick={onMinimize}
-          className="rounded px-2 py-1 text-xs text-white hover:bg-blue-500/20 border border-blue-500 focus:outline-none"
+          className="w-full text-center font-serif text-sm text-[var(--foreground)] hover:underline focus:outline-none"
           aria-label="Minimize chat"
         >
-          Minimize
+          Minimize chat
         </button>
       </header>
       <div
         ref={listRef}
-        className="min-h-0 flex-1 overflow-y-auto px-3 py-3 space-y-3"
+        className="min-h-0 flex-1 overflow-y-auto px-4 py-4 space-y-4"
       >
         {showWelcome && (
           <div className="flex justify-start">
-            <div className="max-w-[90%] rounded-lg bg-gray-800 border border-blue-500 px-3 py-2 text-sm text-white">
+            <div className="max-w-[90%] rounded-2xl bg-[var(--surface)] border border-[var(--border)] px-4 py-3 font-serif text-base text-[var(--foreground)]">
               {WELCOME}
             </div>
           </div>
@@ -91,10 +94,10 @@ export function ChatPanel({ genre }: ChatPanelProps) {
             className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[90%] rounded-lg px-3 py-2 text-sm border ${
+              className={`max-w-[90%] rounded-2xl px-4 py-3 font-serif text-base border ${
                 m.role === 'user'
-                  ? 'bg-blue-500/20 border-blue-500 text-white'
-                  : 'bg-gray-800 border-blue-500 text-white'
+                  ? 'bg-[var(--surface)] border-[var(--border)] text-[var(--foreground)]'
+                  : 'bg-[var(--surface)] border-[var(--border)] text-[var(--foreground)]'
               }`}
             >
               <p className="whitespace-pre-wrap">{m.content}</p>
@@ -103,14 +106,14 @@ export function ChatPanel({ genre }: ChatPanelProps) {
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="max-w-[90%] rounded-lg bg-gray-800 border border-blue-500 px-3 py-2 text-sm text-white">
+            <div className="max-w-[90%] rounded-2xl bg-[var(--surface)] border border-[var(--border)] px-4 py-3 font-serif text-base text-[var(--foreground)]">
               …
             </div>
           </div>
         )}
       </div>
       {error && (
-        <div className="shrink-0 border-t border-red-500 bg-red-900/30 px-3 py-2">
+        <div className="shrink-0 border-t-2 border-red-500 bg-red-900/30 px-4 py-2">
           <p className="text-sm text-red-200">{error}</p>
           <button
             type="button"
@@ -123,34 +126,30 @@ export function ChatPanel({ genre }: ChatPanelProps) {
       )}
       <form
         onSubmit={handleSubmit}
-        className="shrink-0 flex gap-2 border-t border-blue-500 p-2"
+        className="shrink-0 flex items-stretch border-t-2 border-[var(--border)] bg-[var(--panel-2)]"
       >
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask a question…"
-          className="min-w-0 flex-1 rounded border border-blue-500 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Ask your questions here!"
+          className="min-w-0 flex-1 bg-transparent px-5 py-4 font-serif text-base text-[var(--foreground)] placeholder-[var(--foreground)]/70 focus:outline-none"
           disabled={isLoading}
         />
         <button
           type="submit"
           disabled={isLoading || !input.trim()}
-          className="shrink-0 rounded bg-blue-500 px-3 py-2 text-sm font-medium text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
+          className="shrink-0 border-l-2 border-[var(--border)] px-5 py-4 font-serif text-2xl text-[var(--foreground)] hover:bg-[var(--panel)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
         >
-          Send
+          →
         </button>
       </form>
     </div>
   );
 }
 
-type ChatbotProps = {
-  genre: string | null;
-};
-
-export default function Chatbot({ genre }: ChatbotProps) {
+export default function Chatbot() {
   const { isMinimized } = useChat();
   if (isMinimized) return <MinimizedChatButton />;
-  return <ChatPanel genre={genre} />;
+  return <ChatPanel />;
 }

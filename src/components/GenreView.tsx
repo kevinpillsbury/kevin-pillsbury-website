@@ -8,9 +8,10 @@ import { MinimizedChatButton, ChatPanel } from '@/components/Chatbot';
 type GenreViewProps = {
   compositions: Pick<Composition, 'id' | 'title' | 'content'>[];
   genre: string;
+  displayGenre: string;
 };
 
-export default function GenreView({ compositions, genre }: GenreViewProps) {
+export default function GenreView({ compositions, genre, displayGenre }: GenreViewProps) {
   const { setCurrentContext, isMinimized } = useChat();
   const [selectedCompositionId, setSelectedCompositionId] = useState<string | null>(null);
 
@@ -34,67 +35,98 @@ export default function GenreView({ compositions, genre }: GenreViewProps) {
 
   if (compositions.length === 0) {
     return (
-      <div className="text-center text-white py-10">
-        <p>There are no compositions in this category yet.</p>
+      <div className="h-full flex items-center justify-center text-center text-[var(--foreground)] px-6">
+        <div>
+          <p className="text-lg">There are no compositions in this category yet.</p>
         <p className="text-sm mt-2">Check back soon!</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <>
-      <div
-        className={`grid gap-6 md:gap-8 grid-cols-1 ${
-          isMinimized
-            ? 'md:grid-cols-[minmax(0,140px)_1fr]'
-            : 'md:grid-cols-[minmax(0,140px)_1fr_minmax(0,280px)]'
-        }`}
-      >
-        {/* Left: Sticky titles */}
-        <aside className="md:sticky md:top-20 md:self-start md:max-h-[calc(100vh-6rem)] md:overflow-y-auto">
-          <h2 className="text-xl font-semibold mb-4 sr-only md:not-sr-only text-white">Compositions</h2>
-          <ul className="space-y-2">
-            {compositions.map((composition) => (
-              <li key={composition.id}>
-                <button
-                  onClick={() => handleSelectComposition(composition.id)}
-                  className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors border ${
-                    selectedCompositionId === composition.id
-                      ? 'bg-blue-500/20 text-white font-semibold border-blue-500'
-                      : 'text-white hover:bg-blue-500/20 border-transparent'
-                  }`}
-                >
-                  {composition.title}
-                </button>
-              </li>
-            ))}
-          </ul>
+    <div className="h-full min-h-0 overflow-hidden">
+      <div className="grid h-full min-h-0 grid-cols-1 gap-10 md:grid-cols-[240px_minmax(0,1fr)_320px] lg:grid-cols-[260px_minmax(0,1fr)_340px]">
+        {/* Left column: genre title + compositions list (independently scrollable) */}
+        <aside className="min-h-0 overflow-hidden">
+          <div className="flex h-full min-h-0 flex-col">
+            <h1 className="font-serif text-6xl leading-none text-[var(--foreground)]">
+              {displayGenre}
+            </h1>
+
+            <div className="mt-10 flex min-h-0 flex-1 flex-col">
+              <div className="mb-4 flex items-center justify-start">
+                <div className="inline-flex items-center justify-center border border-[var(--border)] px-5 py-2 text-xl font-serif text-[var(--foreground)]">
+                  Compositions
+                </div>
+              </div>
+
+              <div className="flex min-h-0 flex-1 items-stretch gap-6">
+                <ul className="min-h-0 flex-1 overflow-y-auto pr-2 space-y-4">
+                  {compositions.map((composition) => (
+                    <li key={composition.id}>
+                      <button
+                        onClick={() => handleSelectComposition(composition.id)}
+                        className={`w-full text-left font-serif text-2xl leading-tight transition-colors ${
+                          selectedCompositionId === composition.id
+                            ? 'rounded-md bg-[var(--panel)] px-5 py-2 text-[var(--foreground)]'
+                            : 'px-1 py-2 text-[var(--foreground)]/90 hover:text-[var(--foreground)]'
+                        }`}
+                      >
+                        {composition.title}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Vertical divider */}
+                <div className="hidden md:block w-px bg-[var(--border)]/70" />
+              </div>
+            </div>
+          </div>
         </aside>
 
-        {/* Center: Scrollable content */}
-        <main className="flex min-h-0 justify-center">
-          <div className="w-full max-w-4xl">
-            {selectedComposition ? (
-              <article className="prose prose-lg max-w-none prose-invert bg-gray-900/50 text-white rounded-lg p-6 sm:p-8 ring-1 ring-blue-500 border border-blue-500">
-                <h3 className="text-2xl font-bold text-white text-center">{selectedComposition.title}</h3>
-                <p className="text-white whitespace-pre-line">{selectedComposition.content}</p>
-              </article>
+        {/* Center column: composition content (independently scrollable) */}
+        <section className="min-h-0 overflow-hidden flex justify-center">
+          <div className="w-full max-w-3xl">
+            <div className="h-full min-h-0 overflow-hidden rounded-[3.25rem] border border-[var(--border)] bg-[var(--panel)]">
+              <div className="h-full min-h-0 overflow-y-auto px-8 py-6 sm:px-10 sm:py-7">
+                {selectedComposition ? (
+                  <>
+                    <h2 className="font-serif text-4xl text-center text-[var(--foreground)] mb-4">
+                      {selectedComposition.title}
+                    </h2>
+                    <div className="font-serif text-[var(--foreground)]/90 text-lg leading-relaxed whitespace-pre-line">
+                      {selectedComposition.content}
+                    </div>
+                  </>
+                ) : (
+                  <div className="h-full min-h-[240px] flex items-start justify-center pt-10">
+                    <p className="font-serif text-2xl text-[var(--foreground)]/90">
+                      No composition selected.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Right column: chat (width stays fixed; content swaps when minimized) */}
+        <aside className="min-h-0 overflow-hidden">
+          <div className="flex h-full min-h-0 flex-col">
+            {!isMinimized ? (
+              <div className="h-full min-h-0 pt-2">
+                <ChatPanel />
+              </div>
             ) : (
-              <div className="flex min-h-[200px] items-center justify-center text-white">
-                <p>Select a title from the list to read.</p>
+              <div className="h-full min-h-0 flex items-end justify-end pb-6">
+                <MinimizedChatButton />
               </div>
             )}
           </div>
-        </main>
-
-        {/* Right: Chat panel (when expanded) */}
-        {!isMinimized && (
-          <aside className="md:sticky md:top-20 md:self-start md:max-h-[calc(100vh-6rem)] min-h-[320px] md:min-h-[320px]">
-            <ChatPanel genre={genre} />
-          </aside>
-        )}
+        </aside>
       </div>
-      {isMinimized && <MinimizedChatButton />}
-    </>
+    </div>
   );
 }

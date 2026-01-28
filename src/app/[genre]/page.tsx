@@ -67,9 +67,8 @@ export default async function GenrePage({ params }: GenrePageProps) {
   // but generateStaticParams helps limit valid genre routes.
 
   return (
-    <div className="w-full">
-      <h1 className="text-4xl sm:text-5xl font-bold mb-8 capitalize text-left text-white">{formattedGenre}</h1>
-      <GenreView compositions={compositions} genre={genre} />
+    <div className="w-full h-[calc(100vh-8rem)] overflow-hidden">
+      <GenreView compositions={compositions} genre={genre} displayGenre={formattedGenre} />
     </div>
   );
 }

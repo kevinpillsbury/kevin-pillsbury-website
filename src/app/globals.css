@@ -1,9 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #111827;
-  --foreground: #ffffff;
-  --accent: #3b82f6;
+  /* Screenshot-inspired palette */
+  --background: #050505; /* near-black */
+  --foreground: #e7c9a2; /* warm tan */
+  --panel: #5a160c; /* deep maroon */
+  --panel-2: #4b120a; /* darker maroon */
+  --surface: #0b0b0b; /* near-black surface */
+  --border: #d7b48c; /* tan border */
 }
 
 body {
