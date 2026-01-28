@@ -15,7 +15,6 @@ export default function GenreView({ compositions, displayGenre }: GenreViewProps
   const [selectedCompositionId, setSelectedCompositionId] = useState<string | null>(null);
 
   const selectedComposition = compositions.find((c) => c.id === selectedCompositionId);
-  const isPoetry = displayGenre === 'Poetry';
 
   useEffect(() => {
     setCurrentContext(
@@ -92,22 +91,14 @@ export default function GenreView({ compositions, displayGenre }: GenreViewProps
             <div className="h-full min-h-0 overflow-hidden rounded-[3.25rem] border border-[var(--text-borders)] bg-[var(--bubbles)]">
               <div className="h-full min-h-0 overflow-y-auto px-8 py-6 sm:px-10 sm:py-7">
                 {selectedComposition ? (
-                  <div
-                    className={
-                      isPoetry ? 'max-w-xl mx-auto text-left' : undefined
-                    }
-                  >
-                    <h2
-                      className={`font-serif text-4xl text-[var(--text-borders)] mb-4 ${
-                        isPoetry ? 'text-left' : 'text-center'
-                      }`}
-                    >
+                  <>
+                    <h2 className="font-serif text-4xl text-center text-[var(--text-borders)] mb-4">
                       {selectedComposition.title}
                     </h2>
-                    <div className="font-serif text-[var(--text-borders)]/90 text-lg leading-relaxed whitespace-pre-line text-left">
+                    <div className="font-serif text-[var(--text-borders)]/90 text-lg leading-relaxed whitespace-pre-line">
                       {selectedComposition.content}
                     </div>
-                  </div>
+                  </>
                 ) : (
                   <div className="h-full min-h-[240px] flex items-start justify-center pt-10">
                     <p className="font-serif text-2xl text-[var(--text-borders)]/90">
