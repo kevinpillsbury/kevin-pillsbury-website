@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { useTheme } from "@/lib/theme-context";
+import { useTheme } from "../lib/theme-context";
 
 const Navbar = () => {
   const { themes, activeTheme, setActiveThemeByName } = useTheme();
