@@ -1,8 +1,12 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Chatbot (Gemini)
+
+The site includes a RAG-style chatbot on genre pages (Fiction, Poems, Essays, Drama) using the Gemini API. Ensure `GEMINI_API_KEY` is set in `.env`. Customize the chatbot’s role in `src/lib/chatbot-config.ts`.
+
 ## Getting Started
 
-First, run the development server:
+Run `npm install` (installs `@google/genai`), then start the dev server:
 
 ```bash
 npm run dev

@@ -1,15 +1,27 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Composition } from '../generated/prisma/client';
+import { useChat } from '@/lib/chat-context';
 
 type GenreViewProps = {
-  // We only need a subset of fields, but using the full type is fine
   compositions: Pick<Composition, 'id' | 'title' | 'content'>[];
+  genre: string;
 };
 
-export default function GenreView({ compositions }: GenreViewProps) {
+export default function GenreView({ compositions, genre }: GenreViewProps) {
+  const { setCurrentContext } = useChat();
   const [selectedCompositionId, setSelectedCompositionId] = useState<string | null>(null);
+
+  const selectedComposition = compositions.find((c) => c.id === selectedCompositionId);
+
+  useEffect(() => {
+    setCurrentContext(
+      genre,
+      selectedCompositionId,
+      selectedComposition?.title ?? null
+    );
+  }, [genre, selectedCompositionId, selectedComposition?.title, setCurrentContext]);
 
   const handleSelectComposition = (id: string) => {
     // If the same composition is clicked again, deselect it
@@ -19,8 +31,6 @@ export default function GenreView({ compositions }: GenreViewProps) {
       setSelectedCompositionId(id);
     }
   };
-
-  const selectedComposition = compositions.find(c => c.id === selectedCompositionId);
 
   if (compositions.length === 0) {
     return (
@@ -32,8 +42,8 @@ export default function GenreView({ compositions }: GenreViewProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[minmax(0,140px)_1fr_1fr] gap-8">
-      {/* Left Column (Sticky titles) – narrower */}
+    <div className="grid grid-cols-1 md:grid-cols-[minmax(0,140px)_1fr] gap-8">
+      {/* Left: Sticky titles */}
       <aside className="md:sticky md:top-20 md:self-start md:max-h-[calc(100vh-6rem)] md:overflow-y-auto">
         <h2 className="text-xl font-semibold mb-4 sr-only md:not-sr-only text-white">Compositions</h2>
         <ul className="space-y-2">
@@ -54,8 +64,8 @@ export default function GenreView({ compositions }: GenreViewProps) {
         </ul>
       </aside>
 
-      {/* Center Column (Content horizontally centered) – wider */}
-      <main className="flex justify-center">
+      {/* Center: Scrollable content */}
+      <main className="flex justify-center min-h-0">
         <div className="w-full max-w-4xl">
           {selectedComposition ? (
             <article className="prose prose-lg max-w-none prose-invert bg-gray-900/50 text-white rounded-lg p-6 sm:p-8 ring-1 ring-blue-500 border border-blue-500">
@@ -69,9 +79,6 @@ export default function GenreView({ compositions }: GenreViewProps) {
           )}
         </div>
       </main>
-
-      {/* Right Column – empty, reserved for later */}
-      <div className="hidden md:block" aria-hidden="true" />
     </div>
   );
 }
