@@ -95,20 +95,27 @@ ${compositionsBlob}`;
     const text = res.text ?? '';
     return NextResponse.json({ text });
   } catch (err: unknown) {
+    // Log the full error so we can debug
+    console.error('[chat] Error:', err);
+
     const status = (err as { status?: number })?.status;
-    const message = String((err as { message?: string })?.message ?? '');
+    const errMessage = String((err as { message?: string })?.message ?? '');
+    
+    // Only treat as rate limit if it's clearly a 429 or resource exhausted error
     const isRateLimit =
       status === 429 ||
-      /rate limit|resource exhausted|429|RESOURCE_EXHAUSTED/i.test(message);
+      /resource.?exhausted|quota.?exceeded/i.test(errMessage);
+    
     if (isRateLimit) {
       return NextResponse.json(
         { error: RATE_LIMIT_MESSAGE },
         { status: 429 }
       );
     }
-    console.error('Chat API error:', err);
+
+    // Return the actual error message for debugging (you can make this generic later)
     return NextResponse.json(
-      { error: 'Something went wrong. Please try again.' },
+      { error: `API Error: ${errMessage || 'Something went wrong. Please try again.'}` },
       { status: 500 }
     );
   }
