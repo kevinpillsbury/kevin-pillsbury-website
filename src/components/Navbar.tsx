@@ -37,15 +37,15 @@ const Navbar = () => {
                   </DropdownMenu.Item>
                   <DropdownMenu.Item asChild>
                     <Link
-                      href="/poem"
+                      href="/poetry"
                       className="block px-5 py-3 text-base text-[var(--foreground)] hover:bg-[var(--panel-2)]"
                     >
-                      Poems
+                      Poetry
                     </Link>
                   </DropdownMenu.Item>
                   <DropdownMenu.Item asChild>
                     <Link
-                      href="/essay"
+                      href="/essays"
                       className="block px-5 py-3 text-base text-[var(--foreground)] hover:bg-[var(--panel-2)]"
                     >
                       Essays

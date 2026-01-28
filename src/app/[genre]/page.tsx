@@ -11,20 +11,30 @@ interface GenrePageProps {
 // Revalidate every hour
 export const revalidate = 3600;
 
+const GENRE_BY_SLUG: Record<
+  string,
+  { db: string; display: string }
+> = {
+  fiction: { db: 'fiction', display: 'Fiction' },
+  poetry: { db: 'poetry', display: 'Poetry' },
+  drama: { db: 'drama', display: 'Drama' },
+  essays: { db: 'essays', display: 'Essays' },
+};
+
 // Pre-build these pages at build time
 export async function generateStaticParams() {
-  const genres = ['fiction', 'poem', 'essay', 'drama'];
-  return genres.map((genre) => ({
-    genre: genre,
+  const genres = Object.keys(GENRE_BY_SLUG);
+  return genres.map((slug) => ({
+    genre: slug,
   }));
 }
 
-async function getCompositionsByGenre(genre: string) {
+async function getCompositionsByGenre(dbGenre: string) {
   try {
     const compositions = await prisma.composition.findMany({
       where: {
         genre: {
-          equals: genre,
+          equals: dbGenre,
           mode: 'insensitive', // Case-insensitive matching
         },
       },
@@ -39,7 +49,7 @@ async function getCompositionsByGenre(genre: string) {
     });
     return compositions;
   } catch (error) {
-    console.error(`Error fetching compositions for genre "${genre}":`, error);
+    console.error(`Error fetching compositions for genre "${dbGenre}":`, error);
     return []; // Return empty array on error
   }
 }
@@ -52,15 +62,17 @@ export default async function GenrePage({ params }: GenrePageProps) {
     return notFound();
   }
 
-  const compositions = await getCompositionsByGenre(genre);
+  const slug = genre.toLowerCase();
+  const genreInfo = GENRE_BY_SLUG[slug];
+  if (!genreInfo) return notFound();
 
-  const formattedGenre = genre.charAt(0).toUpperCase() + genre.slice(1);
+  const compositions = await getCompositionsByGenre(genreInfo.db);
 
   if (compositions.length === 0) {
     // This allows the page to render with a "not found" message 
     // instead of a hard 404, which is better UX if the genre is valid
     // but just doesn't have content yet.
-    console.warn(`No compositions found for genre: ${genre}`);
+    console.warn(`No compositions found for genre: ${genreInfo.db}`);
   }
   
   // A true 404 would be better if the genre itself is invalid,
@@ -68,7 +80,7 @@ export default async function GenrePage({ params }: GenrePageProps) {
 
   return (
     <div className="w-full h-[calc(100vh-8rem)] overflow-hidden">
-      <GenreView compositions={compositions} genre={genre} displayGenre={formattedGenre} />
+      <GenreView compositions={compositions} displayGenre={genreInfo.display} />
     </div>
   );
 }

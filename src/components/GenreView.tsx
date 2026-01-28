@@ -7,11 +7,10 @@ import { MinimizedChatButton, ChatPanel } from '@/components/Chatbot';
 
 type GenreViewProps = {
   compositions: Pick<Composition, 'id' | 'title' | 'content'>[];
-  genre: string;
   displayGenre: string;
 };
 
-export default function GenreView({ compositions, genre, displayGenre }: GenreViewProps) {
+export default function GenreView({ compositions, displayGenre }: GenreViewProps) {
   const { setCurrentContext, isMinimized } = useChat();
   const [selectedCompositionId, setSelectedCompositionId] = useState<string | null>(null);
 
@@ -19,11 +18,11 @@ export default function GenreView({ compositions, genre, displayGenre }: GenreVi
 
   useEffect(() => {
     setCurrentContext(
-      genre,
+      displayGenre,
       selectedCompositionId,
       selectedComposition?.title ?? null
     );
-  }, [genre, selectedCompositionId, selectedComposition?.title, setCurrentContext]);
+  }, [displayGenre, selectedCompositionId, selectedComposition?.title, setCurrentContext]);
 
   const handleSelectComposition = (id: string) => {
     if (selectedCompositionId === id) {
@@ -46,19 +45,19 @@ export default function GenreView({ compositions, genre, displayGenre }: GenreVi
 
   return (
     <div className="h-full min-h-0 overflow-hidden">
-      <div className="grid h-full min-h-0 grid-cols-1 gap-10 md:grid-cols-[240px_minmax(0,1fr)_320px] lg:grid-cols-[260px_minmax(0,1fr)_340px]">
+      <div className="grid h-full min-h-0 grid-cols-1 gap-10 md:grid-cols-[120px_minmax(0,1fr)_160px] lg:grid-cols-[130px_minmax(0,1fr)_170px]">
         {/* Left column: genre title + compositions list (independently scrollable) */}
         <aside className="min-h-0 overflow-hidden">
           <div className="flex h-full min-h-0 flex-col">
-            <h1 className="font-serif text-6xl leading-none text-[var(--foreground)]">
+            <h1 className="font-serif text-5xl lg:text-6xl leading-none text-[var(--foreground)]">
               {displayGenre}
             </h1>
 
             <div className="mt-10 flex min-h-0 flex-1 flex-col">
               <div className="mb-4 flex items-center justify-start">
-                <div className="inline-flex items-center justify-center border border-[var(--border)] px-5 py-2 text-xl font-serif text-[var(--foreground)]">
+                <h2 className="text-2xl font-serif text-[var(--foreground)]">
                   Compositions
-                </div>
+                </h2>
               </div>
 
               <div className="flex min-h-0 flex-1 items-stretch gap-6">
@@ -67,7 +66,7 @@ export default function GenreView({ compositions, genre, displayGenre }: GenreVi
                     <li key={composition.id}>
                       <button
                         onClick={() => handleSelectComposition(composition.id)}
-                        className={`w-full text-left font-serif text-2xl leading-tight transition-colors ${
+                        className={`w-full text-left font-serif text-lg md:text-xl leading-tight transition-colors ${
                           selectedCompositionId === composition.id
                             ? 'rounded-md bg-[var(--panel)] px-5 py-2 text-[var(--foreground)]'
                             : 'px-1 py-2 text-[var(--foreground)]/90 hover:text-[var(--foreground)]'
