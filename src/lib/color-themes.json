@@ -18,6 +18,13 @@
     "background": "#8fadbf",
     "text-borders": "#FFFFFF",
     "bubbles": "#fab764"
+  },
+
+  {
+    "name": "Fletcher",
+    "background": "#000000",
+    "text-borders": "#888888",
+    "bubbles": "#FFFFFF"
   }
 ]
 
