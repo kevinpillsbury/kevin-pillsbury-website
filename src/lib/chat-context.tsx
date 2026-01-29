@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useRef,
   useState,
   type ReactNode,
@@ -32,12 +33,42 @@ type ChatContextValue = {
 
 const ChatContext = createContext<ChatContextValue | null>(null);
 
+const CHAT_SESSION_STORAGE_KEY = 'kpw_chat_messages_v1';
+
+function parseStoredMessages(raw: string): ChatMessage[] | null {
+  try {
+    const data: unknown = JSON.parse(raw);
+    if (!Array.isArray(data)) return null;
+    const msgs: ChatMessage[] = [];
+    for (const item of data) {
+      if (
+        !item ||
+        typeof item !== 'object' ||
+        !('role' in item) ||
+        !('content' in item)
+      ) {
+        return null;
+      }
+      const role = (item as { role?: unknown }).role;
+      const content = (item as { content?: unknown }).content;
+      if ((role !== 'user' && role !== 'assistant') || typeof content !== 'string') {
+        return null;
+      }
+      msgs.push({ role, content });
+    }
+    return msgs;
+  } catch {
+    return null;
+  }
+}
+
 export function ChatProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isMinimized, setIsMinimized] = useState(true);
   const [hasGreeted, setHasGreeted] = useState(false);
+  const [isHistoryInitialized, setIsHistoryInitialized] = useState(false);
   const [currentGenre, setCurrentGenre] = useState<string | null>(null);
   const [currentCompositionId, setCurrentCompositionId] = useState<
     string | null
@@ -71,9 +102,38 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   const clearError = useCallback(() => setError(null), []);
 
+  useEffect(() => {
+    // Persist chat history for the lifetime of the current tab/session.
+    try {
+      const raw = sessionStorage.getItem(CHAT_SESSION_STORAGE_KEY);
+      if (raw) {
+        const parsed = parseStoredMessages(raw);
+        if (parsed) setMessages(parsed);
+      }
+    } catch {
+      // Ignore storage errors (privacy mode, etc.)
+    } finally {
+      setIsHistoryInitialized(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isHistoryInitialized) return;
+    try {
+      if (messages.length === 0) {
+        sessionStorage.removeItem(CHAT_SESSION_STORAGE_KEY);
+      } else {
+        sessionStorage.setItem(CHAT_SESSION_STORAGE_KEY, JSON.stringify(messages));
+      }
+    } catch {
+      // Ignore storage errors.
+    }
+  }, [messages, isHistoryInitialized]);
+
   const ensureGreeting = useCallback(async () => {
     // Only once per provider "session", and only if the user hasn't started chatting.
     const { messages: hist, currentCompositionId: cid, currentGenre: g } = ctxRef.current;
+    if (!isHistoryInitialized) return;
     if (hasGreeted || hist.length > 0) return;
 
     const prompt =
@@ -109,7 +169,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  }, [hasGreeted]);
+  }, [hasGreeted, isHistoryInitialized]);
 
   const sendMessage = useCallback(async (text: string) => {
     const trimmed = text.trim();
