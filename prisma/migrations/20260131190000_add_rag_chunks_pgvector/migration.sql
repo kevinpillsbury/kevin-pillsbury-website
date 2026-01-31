@@ -1,4 +1,6 @@
 -- Enable pgvector for embeddings
+-- gen_random_uuid() comes from pgcrypto; ensure it's available for defaults.
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE EXTENSION IF NOT EXISTS vector;
 
 -- Store chunked composition text + embeddings for RAG retrieval

@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { GoogleGenAI } from '@google/genai';
-import { Pool } from '@neondatabase/serverless';
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import ws from 'ws';
 import {
   chunkComposition,
   normalizeEmbedding,
@@ -19,6 +20,10 @@ function requiredEnv(name) {
 async function main() {
   const connectionString = requiredEnv('DATABASE_URL');
   const apiKey = requiredEnv('GEMINI_API_KEY');
+
+  // Ensure Neon serverless driver works in Node (Vercel build environment).
+  // Without this, some environments fail with "WebSocket is not defined".
+  neonConfig.webSocketConstructor = ws;
 
   const pool = new Pool({ connectionString });
   const ai = new GoogleGenAI({ apiKey });
