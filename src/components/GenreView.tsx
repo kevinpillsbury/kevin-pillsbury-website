@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { Composition } from '../generated/prisma/client';
+import { Composition } from '@prisma/client';
 import { useChat } from '@/lib/chat-context';
 import { MinimizedChatButton, ChatPanel } from '@/components/Chatbot';
 

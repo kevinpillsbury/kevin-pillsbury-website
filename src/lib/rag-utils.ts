@@ -1,14 +1,8 @@
 /**
- * RAG utilities shared by the API route and deploy-time indexing script.
- * Plain JS so it can be executed by Node during Vercel builds.
+ * RAG utilities used by the runtime chat API.
  */
 
-/**
- * Split plain text into paragraphs. Paragraphs are separated by one-or-more blank lines.
- * @param {string} text
- * @returns {string[]}
- */
-export function splitParagraphs(text) {
+export function splitParagraphs(text: string): string[] {
   const normalized = String(text ?? '').replace(/\r\n/g, '\n').trim();
   if (!normalized) return [];
   return normalized
@@ -17,20 +11,14 @@ export function splitParagraphs(text) {
     .filter(Boolean);
 }
 
-/**
- * Pack paragraphs into chunks so dialogue-heavy text doesn't become tiny chunks.
- * Uses character counts as a cheap approximation of token budgets.
- * @param {string[]} paragraphs
- * @param {{ targetChars: number, maxChars: number }} opts
- * @returns {string[]}
- */
-export function packParagraphs(paragraphs, opts) {
+export function packParagraphs(
+  paragraphs: string[],
+  opts?: { targetChars?: number; maxChars?: number }
+): string[] {
   const targetChars = opts?.targetChars ?? 3500;
   const maxChars = opts?.maxChars ?? 4500;
-  /** @type {string[]} */
-  const chunks = [];
-  /** @type {string[]} */
-  let current = [];
+  const chunks: string[] = [];
+  let current: string[] = [];
   let currentLen = 0;
 
   const flush = () => {
@@ -44,10 +32,12 @@ export function packParagraphs(paragraphs, opts) {
     const p = String(para ?? '').trim();
     if (!p) continue;
 
-    // If a single paragraph is huge, split it on lines to keep within maxChars.
     if (p.length > maxChars) {
       flush();
-      const lines = p.split('\n').map((l) => l.trim()).filter(Boolean);
+      const lines = p
+        .split('\n')
+        .map((l) => l.trim())
+        .filter(Boolean);
       let buf = '';
       for (const line of lines) {
         const next = buf ? `${buf}\n${line}` : line;
@@ -70,7 +60,6 @@ export function packParagraphs(paragraphs, opts) {
       continue;
     }
 
-    // If we haven't hit maxChars yet, allow a bit of overshoot to reduce chunk count.
     if (nextLen <= maxChars) {
       current.push(p);
       currentLen = nextLen;
@@ -87,16 +76,14 @@ export function packParagraphs(paragraphs, opts) {
   return chunks.filter(Boolean);
 }
 
-/**
- * Build chunks for a composition.
- * - Poetry: always 1 chunk (keep the whole piece intact)
- * - Other genres: paragraph-aware packing
- *
- * @param {{ title: string, content: string, genre: string }} composition
- * @returns {string[]}
- */
-export function chunkComposition(composition) {
-  const content = String(composition?.content ?? '').replace(/\r\n/g, '\n').trim();
+export function chunkComposition(composition: {
+  title: string;
+  content: string;
+  genre: string;
+}): string[] {
+  const content = String(composition?.content ?? '')
+    .replace(/\r\n/g, '\n')
+    .trim();
   const genre = String(composition?.genre ?? '').toLowerCase().trim();
 
   if (!content) return [];
@@ -105,16 +92,10 @@ export function chunkComposition(composition) {
   const paragraphs = splitParagraphs(content);
   if (paragraphs.length <= 1) return [content];
 
-  // Dialogue-heavy prose often has short paragraphs; packing prevents tiny chunks.
   return packParagraphs(paragraphs, { targetChars: 3200, maxChars: 4800 });
 }
 
-/**
- * Normalize an embedding vector to unit length.
- * @param {number[]} values
- * @returns {number[]}
- */
-export function normalizeEmbedding(values) {
+export function normalizeEmbedding(values: number[]): number[] {
   const v = (values ?? []).map((x) => Number(x));
   let sumSq = 0;
   for (const x of v) sumSq += x * x;
@@ -123,13 +104,7 @@ export function normalizeEmbedding(values) {
   return v.map((x) => x / norm);
 }
 
-/**
- * Format an embedding as a pgvector literal.
- * @param {number[]} values
- * @returns {string}
- */
-export function toVectorLiteral(values) {
-  // Keep a stable, compact string; pgvector accepts text like "[0.1,0.2,...]".
+export function toVectorLiteral(values: number[]): string {
   return `[${(values ?? []).map((x) => Number(x).toFixed(8)).join(',')}]`;
 }
 

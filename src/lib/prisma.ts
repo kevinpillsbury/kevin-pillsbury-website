@@ -1,5 +1,5 @@
 // src/lib/prisma.ts
-import { PrismaClient } from '../generated/prisma/client'
+import { PrismaClient } from '@prisma/client'
 import { PrismaNeon } from '@prisma/adapter-neon'
 
 // Prevent multiple instances of Prisma Client in development

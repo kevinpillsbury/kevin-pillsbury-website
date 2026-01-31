@@ -6,7 +6,7 @@ import {
   chunkComposition,
   normalizeEmbedding,
   toVectorLiteral,
-} from '../src/lib/rag-utils.js';
+} from './rag-utils.mjs';
 
 const EMBEDDING_MODEL = 'gemini-embedding-001';
 const EMBEDDING_DIM = 768;
