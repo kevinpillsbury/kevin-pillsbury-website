@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import prisma from '@/lib/prisma';
 import { CHATBOT_ROLE } from '@/lib/chatbot-config';
+import { normalizeEmbedding, toVectorLiteral } from '@/lib/rag-utils';
 
 const RATE_LIMIT_MESSAGE =
   "Woah! You've got a lot of questions. I'm not even sure Boss Kevin could answer this fast. Give me a second though and I'll see if I can find him for you.";
@@ -15,8 +16,31 @@ const NO_API_KEY_MESSAGE =
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 1500;
+const EMBEDDING_MODEL = 'gemini-embedding-001';
+const EMBEDDING_DIM = 768;
+const GLOBAL_TOP_K = 10;
+const GLOBAL_CANDIDATE_K = 30;
+const MAX_CHUNKS_PER_OTHER_COMPOSITION = 3;
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
+
+type RetrievedChunk = {
+  compositionId: string;
+  chunkIndex: number;
+  title: string;
+  genre: string;
+  content: string;
+};
+
+function looksLikeListAllRequest(text: string) {
+  const t = text.toLowerCase();
+  return (
+    /list\s+all\s+compositions/.test(t) ||
+    /list\s+all\s+(stories|poems|essays|works)/.test(t) ||
+    /show\s+me\s+all\s+compositions/.test(t) ||
+    /what\s+are\s+all\s+the\s+compositions/.test(t)
+  );
+}
 
 export async function POST(req: Request) {
   try {
@@ -49,40 +73,142 @@ export async function POST(req: Request) {
       );
     }
 
-    const compositions = await prisma.composition.findMany({
-      orderBy: { title: 'asc' },
-      select: { id: true, title: true, content: true, genre: true },
-    });
-
-    const compositionsBlob = compositions
-      .map(
-        (c) =>
-          `[${c.genre}] "${c.title}" (id: ${c.id})\n${c.content}\n---`
-      )
-      .join('\n\n');
+    // Cheap token-saving rule: the user can browse the catalog in the UI already.
+    if (looksLikeListAllRequest(message)) {
+      return NextResponse.json({
+        text: `No. Boss Kevin already arranged all the compositions neatly on the site, and I refuse to recite the entire archive like some kind of obedient audiobook crab.`,
+      });
+    }
 
     let contextBlob = '';
     if (currentGenre) {
       contextBlob += `The user is currently on the ${currentGenre} page.`;
     }
     if (currentCompositionId) {
-      const curr = compositions.find((c) => c.id === currentCompositionId);
-      if (curr) {
-        contextBlob += ` They are viewing the composition "${curr.title}".`;
-      }
+      contextBlob += ` They are viewing a specific composition (id: ${currentCompositionId}).`;
     }
     if (contextBlob) {
       contextBlob = `\n\nCurrent context: ${contextBlob}`;
     }
 
+    const ai = new GoogleGenAI({ apiKey });
+
+    // 1) Embed the user query for retrieval.
+    let queryVectorLiteral: string | null = null;
+    try {
+      const embedRes = await ai.models.embedContent({
+        model: EMBEDDING_MODEL,
+        contents: message,
+        config: {
+          taskType: 'RETRIEVAL_QUERY',
+          outputDimensionality: EMBEDDING_DIM,
+        },
+      });
+      const v = embedRes.embeddings?.[0]?.values ?? [];
+      const normed = normalizeEmbedding(v);
+      queryVectorLiteral = toVectorLiteral(normed);
+    } catch (e) {
+      // If embeddings fail, we can still chat (just with no retrieval context).
+      console.warn('[chat] Embeddings failed; continuing without retrieval context.', e);
+    }
+
+    // 2) Retrieve context chunks.
+    let currentCompositionChunks: RetrievedChunk[] = [];
+    let globalCandidates: RetrievedChunk[] = [];
+
+    if (currentCompositionId) {
+      try {
+        currentCompositionChunks = await prisma.$queryRaw<RetrievedChunk[]>`
+          SELECT
+            "compositionId",
+            "chunkIndex",
+            "title",
+            "genre",
+            "content"
+          FROM "CompositionChunk"
+          WHERE "compositionId" = ${currentCompositionId}
+          ORDER BY "chunkIndex" ASC
+        `;
+      } catch (e) {
+        console.warn('[chat] Failed to load current composition chunks.', e);
+      }
+    }
+
+    if (queryVectorLiteral) {
+      try {
+        if (currentCompositionId) {
+          globalCandidates = await prisma.$queryRaw<RetrievedChunk[]>`
+            SELECT
+              "compositionId",
+              "chunkIndex",
+              "title",
+              "genre",
+              "content"
+            FROM "CompositionChunk"
+            WHERE "compositionId" <> ${currentCompositionId}
+            ORDER BY "embedding" <=> ${queryVectorLiteral}::vector
+            LIMIT ${GLOBAL_CANDIDATE_K}
+          `;
+        } else {
+          globalCandidates = await prisma.$queryRaw<RetrievedChunk[]>`
+            SELECT
+              "compositionId",
+              "chunkIndex",
+              "title",
+              "genre",
+              "content"
+            FROM "CompositionChunk"
+            ORDER BY "embedding" <=> ${queryVectorLiteral}::vector
+            LIMIT ${GLOBAL_CANDIDATE_K}
+          `;
+        }
+      } catch (e) {
+        console.warn('[chat] Global retrieval failed; continuing without global context.', e);
+      }
+    }
+
+    // Mild diversity: cap chunks per non-current composition so one long story doesn't dominate.
+    const perCompositionCount = new Map<string, number>();
+    const globalChosen: RetrievedChunk[] = [];
+    for (const c of globalCandidates) {
+      const n = perCompositionCount.get(c.compositionId) ?? 0;
+      if (n >= MAX_CHUNKS_PER_OTHER_COMPOSITION) continue;
+      perCompositionCount.set(c.compositionId, n + 1);
+      globalChosen.push(c);
+      if (globalChosen.length >= GLOBAL_TOP_K) break;
+    }
+
+    const seen = new Set<string>();
+    const contextChunks: RetrievedChunk[] = [];
+    for (const c of [...currentCompositionChunks, ...globalChosen]) {
+      const key = `${c.compositionId}:${c.chunkIndex}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      contextChunks.push(c);
+    }
+
+    const contextText =
+      contextChunks.length === 0
+        ? 'No retrieved composition context was available for this question.'
+        : contextChunks
+            .map(
+              (c) =>
+                `[${c.genre}] "${c.title}" (id: ${c.compositionId}, chunk: ${c.chunkIndex})\n${c.content}`
+            )
+            .join('\n\n---\n\n');
+
     const systemInstruction = `${CHATBOT_ROLE}
 
-Below are all of Kevin Pillsbury's compositions. Use them to answer questions. Each block is [genre] "title" (id) followed by the full text.
+You are answering questions about Kevin Pillsbury's writing using RETRIEVED CONTEXT below.
+- If the answer is not supported by the retrieved context, say you don't know, with a funny whimsical excuse in-character.
+- Keep responses to 1 to 3 sentences.
+- If you use information from the context, include a short citation like (source: "<title>").
+- If the user asks you to list all compositions, refuse.
 ${contextBlob}
 
---- COMPOSITIONS ---
+--- RETRIEVED CONTEXT ---
 
-${compositionsBlob}`;
+${contextText}`;
 
     const contents: { role: 'user' | 'model'; parts: { text: string }[] }[] = [];
     for (const m of history) {
@@ -91,7 +217,6 @@ ${compositionsBlob}`;
     }
     contents.push({ role: 'user', parts: [{ text: message }] });
 
-    const ai = new GoogleGenAI({ apiKey });
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
         const res = await ai.models.generateContent({

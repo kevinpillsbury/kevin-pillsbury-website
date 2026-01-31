@@ -22,3 +22,20 @@ model Composition {
   
   @@map("Composition")
 }
+
+model CompositionChunk {
+  id            String   @id @default(uuid())
+  compositionId String
+  chunkIndex    Int
+  title         String
+  genre         String
+  content       String
+  // pgvector column; Prisma doesn't natively understand it, but we can store/query via SQL.
+  embedding     Unsupported("vector(768)")
+  createdAt     DateTime @default(now())
+
+  @@unique([compositionId, chunkIndex])
+  @@index([compositionId])
+  @@index([genre])
+  @@map("CompositionChunk")
+}
