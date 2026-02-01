@@ -199,11 +199,8 @@ export async function POST(req: Request) {
 
     const systemInstruction = `${CHATBOT_ROLE}
 
-You are answering questions about Kevin Pillsbury's writing using RETRIEVED CONTEXT below.
+You are answering questions about Kevin Pillsbury's (Boss Kevin)writing using RETRIEVED CONTEXT below.
 - If the answer is not supported by the retrieved context, say you don't know, with a funny whimsical excuse in-character.
-- Keep responses to 1 to 3 sentences.
-- If you use information from the context, include a short citation like (source: "<title>").
-- If the user asks you to list all compositions, refuse.
 ${contextBlob}
 
 --- RETRIEVED CONTEXT ---
@@ -224,7 +221,11 @@ ${contextText}`;
           contents,
           config: { systemInstruction },
         });
-        const text = res.text ?? '';
+        // Sometimes models hallucinate citations like (source: "..."). Strip them.
+        const text = (res.text ?? '')
+          .replace(/\(source:\s*".*?"\)/gi, '')
+          .replace(/\(source:\s*[^)]+\)/gi, '')
+          .trim();
         return NextResponse.json({ text });
       } catch (e) {
         const status = (e as { status?: number })?.status;
