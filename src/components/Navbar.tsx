@@ -12,20 +12,19 @@ const Navbar = () => {
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-start h-16">
           <div className="flex w-full items-center justify-between">
-            <div className="flex items-center gap-6">
+            <div className="flex flex-1 items-center justify-between max-w-2xl">
               <Link
                 href="/"
-                className="rounded-md px-4 py-2 text-sm font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
+                className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
               >
                 Kevin Pillsbury
               </Link>
-              <div className="flex items-center gap-3">
-                <DropdownMenu.Root>
-                  <DropdownMenu.Trigger asChild>
-                    <button className="rounded-md px-4 py-2 text-sm font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0">
-                      <span>Writing</span>
-                    </button>
-                  </DropdownMenu.Trigger>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild>
+                  <button className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0">
+                    <span>Writing</span>
+                  </button>
+                </DropdownMenu.Trigger>
                   <DropdownMenu.Portal>
                     <DropdownMenu.Content
                       className="mt-2 w-64 min-w-[16rem] bg-[var(--background)] rounded-md shadow-lg ring-1 ring-[var(--text-borders)] border border-[var(--text-borders)] focus:outline-none py-2"
@@ -66,17 +65,16 @@ const Navbar = () => {
                     </DropdownMenu.Content>
                   </DropdownMenu.Portal>
                 </DropdownMenu.Root>
-                <Link
-                  href="/rate-my-plot"
-                  className="rounded-md px-4 py-2 text-sm font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
-                >
-                  Rate my plot
-                </Link>
-              </div>
+              <Link
+                href="/rate-my-plot"
+                className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
+              >
+                Rate my plot
+              </Link>
             </div>
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
-                <button className="rounded-md px-4 py-2 text-sm font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0">
+                <button className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0">
                   <span>Color theme</span>
                 </button>
               </DropdownMenu.Trigger>

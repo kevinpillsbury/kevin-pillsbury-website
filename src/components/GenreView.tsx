@@ -101,7 +101,7 @@ export default function GenreView({ compositions, displayGenre }: GenreViewProps
                   </>
                 ) : (
                   <div className="h-full min-h-[240px] flex items-start justify-center pt-10">
-                    <p className="font-serif text-2xl text-[var(--text-borders)]/90">
+                    <p className="font-serif text-lg text-[var(--text-borders)]/90">
                       No composition selected.
                     </p>
                   </div>

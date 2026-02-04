@@ -54,7 +54,7 @@ export default function RateMyPlotPage() {
       ? 'Rating: ...'
       : ratingNum !== null
         ? `Rating: ${ratingNum.toFixed(2)} - ${ratingToLabel(ratingNum)}.`
-        : 'Rating: None';
+        : 'Rating: ';
 
   return (
     <div className="w-full min-h-[calc(100vh-8rem)] flex flex-col">
@@ -67,14 +67,14 @@ export default function RateMyPlotPage() {
         </aside>
 
         {/* Center: plot input (same style as story content) + button */}
-        <section className="flex flex-col gap-4">
-          <div className="rounded-[3.25rem] border border-[var(--text-borders)] bg-[var(--bubbles)] flex-1 min-h-[280px]">
-            <div className="h-full p-6 sm:p-8">
+        <section className="flex flex-col gap-4 min-h-0 flex-1 flex">
+          <div className="rounded-[3.25rem] border border-[var(--text-borders)] bg-[var(--bubbles)] min-h-[400px] flex flex-col overflow-hidden">
+            <div className="flex-1 min-h-0 p-6 sm:p-8 overflow-hidden flex flex-col">
               <textarea
                 value={plot}
                 onChange={(e) => setPlot(e.target.value)}
-                placeholder="Paste or type a book or story description (plot) here…"
-                className="w-full h-full min-h-[200px] bg-transparent text-[var(--text-borders)] placeholder:text-[var(--text-borders)]/50 font-serif text-lg leading-relaxed resize-none focus:outline-none"
+                placeholder="Paste or type a book/story plot here..."
+                className="w-full h-full min-h-[240px] bg-transparent text-[var(--text-borders)] placeholder:text-[var(--text-borders)]/90 placeholder:text-lg font-serif text-lg leading-relaxed resize-none focus:outline-none overflow-y-auto"
                 disabled={loading}
               />
             </div>
