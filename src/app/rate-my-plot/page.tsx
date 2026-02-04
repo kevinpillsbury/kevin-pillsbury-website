@@ -58,7 +58,7 @@ export default function RateMyPlotPage() {
 
   return (
     <div className="w-full min-h-[calc(100vh-8rem)] flex flex-col">
-      <div className="flex-1 grid grid-cols-1 gap-6 md:grid-cols-[280px_minmax(0,1fr)_180px] lg:grid-cols-[320px_minmax(0,1fr)_200px] px-4 sm:px-6 lg:px-8 py-8 max-w-[1400px] mx-auto w-full">
+      <div className="flex-1 grid grid-cols-1 gap-6 md:grid-cols-[280px_minmax(0,1fr)_240px] lg:grid-cols-[320px_minmax(0,1fr)_280px] px-4 sm:px-6 lg:px-8 py-8 max-w-[1400px] mx-auto w-full items-center">
         {/* Left: page description (small text, no bubbles) */}
         <aside className="flex flex-col">
           <div className="text-sm text-[var(--text-borders)]/90 leading-relaxed whitespace-pre-line font-sans">
@@ -94,13 +94,10 @@ export default function RateMyPlotPage() {
           </div>
         </section>
 
-        {/* Right: rating box (bubbles background, smaller) */}
-        <aside className="flex flex-col items-stretch">
-          <div className="rounded-[2rem] border border-[var(--text-borders)] bg-[var(--bubbles)] px-4 py-4 min-h-[88px] flex flex-col justify-center">
-            <p className="text-xs text-[var(--text-borders)]/80 uppercase tracking-wide">
-              Rating
-            </p>
-            <p className="font-serif text-lg text-[var(--text-borders)] mt-0.5">
+        {/* Right: rating box (bubbles background), centered vertically, one line */}
+        <aside className="flex flex-col justify-center items-stretch">
+          <div className="rounded-[2rem] border border-[var(--text-borders)] bg-[var(--bubbles)] px-4 py-3 min-w-[200px] w-full">
+            <p className="font-serif text-base text-[var(--text-borders)] whitespace-nowrap">
               {ratingDisplay}
             </p>
           </div>

@@ -15,14 +15,14 @@ const Navbar = () => {
             <div className="flex items-center gap-6">
               <Link
                 href="/"
-                className="font-serif text-lg text-[var(--text-borders)] hover:opacity-90 focus:outline-none outline-none"
+                className="rounded-md px-4 py-2 text-sm font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
               >
                 Kevin Pillsbury
               </Link>
               <div className="flex items-center gap-3">
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger asChild>
-                    <button className="px-4 py-2 rounded-md text-sm font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] border border-[var(--text-borders)] focus:outline-none outline-none">
+                    <button className="rounded-md px-4 py-2 text-sm font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0">
                       <span>Writing</span>
                     </button>
                   </DropdownMenu.Trigger>
@@ -68,7 +68,7 @@ const Navbar = () => {
                 </DropdownMenu.Root>
                 <Link
                   href="/rate-my-plot"
-                  className="px-4 py-2 rounded-md text-sm font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] border border-[var(--text-borders)] focus:outline-none outline-none"
+                  className="rounded-md px-4 py-2 text-sm font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
                 >
                   Rate my plot
                 </Link>
@@ -76,7 +76,7 @@ const Navbar = () => {
             </div>
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
-                <button className="px-4 py-2 rounded-md text-sm font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] border border-[var(--text-borders)] focus:outline-none outline-none">
+                <button className="rounded-md px-4 py-2 text-sm font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0">
                   <span>Color theme</span>
                 </button>
               </DropdownMenu.Trigger>
