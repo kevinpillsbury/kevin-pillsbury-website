@@ -33,6 +33,11 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# training data (large / optional to commit)
+scripts/books.csv
+scripts/books-cleaned.csv
+scripts/embedding-cache.json
+
 # vercel
 .vercel
 

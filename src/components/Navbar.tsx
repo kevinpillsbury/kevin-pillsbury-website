@@ -69,6 +69,12 @@ const Navbar = () => {
                     </DropdownMenu.Content>
                   </DropdownMenu.Portal>
                 </DropdownMenu.Root>
+                <Link
+                  href="/rate-my-plot"
+                  className="px-4 py-2 rounded-md text-sm font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] border border-[var(--text-borders)] focus:outline-none"
+                >
+                  Rate my plot
+                </Link>
               </div>
             </div>
             <DropdownMenu.Root>
