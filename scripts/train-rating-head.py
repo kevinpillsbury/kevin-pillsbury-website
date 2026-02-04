@@ -16,8 +16,7 @@ Options:
   --output           Output path for the head weights JSON (default: rating-head.json).
   --description-col  CSV column name for the text description (default: description).
   --rating-col       CSV column name for the numeric rating (default: rating).
-  --embedding-cache  Optional path to cache embeddings (JSON). Saves/loads to avoid re-calling the API.
-  --limit            Max rows to use (default: 50). Omit to use full CSV.
+  --limit            Max rows to use (default: 50). Use 0 for full CSV.
   --val-frac         Fraction of data for validation, 0..1 (default: 0.2).
   --epochs           Training epochs (default: 20).
 """
@@ -80,20 +79,8 @@ def load_csv(
 def get_embeddings(
     client: genai.Client,
     descriptions: list[str],
-    cache_path: str | None,
 ) -> np.ndarray:
-    """Fetch embeddings via Gemini real-time embed_content (or load from cache). Returns (n, 768) float32 array, L2-normalized."""
-    if cache_path and Path(cache_path).exists():
-        print(f"Loading cached embeddings from {cache_path}...")
-        with open(cache_path) as f:
-            data = json.load(f)
-        arr = np.array(data["embeddings"], dtype=np.float32)
-        if len(arr) != len(descriptions):
-            print(f"Warning: cache has {len(arr)} embeddings but CSV has {len(descriptions)} rows. Re-embedding all.")
-            cache_path = None
-        else:
-            return arr
-
+    """Fetch embeddings via Gemini real-time embed_content. Returns (n, 768) float32 array, L2-normalized."""
     print(f"Embedding {len(descriptions)} descriptions via real-time API ({EMBEDDING_MODEL}, dim={EMBEDDING_DIM})...")
     config = types.EmbedContentConfig(
         output_dimensionality=EMBEDDING_DIM,
@@ -135,14 +122,7 @@ def get_embeddings(
             raise RuntimeError(f"Empty embedding for row {i}")
         normed = normalize_embedding(np.array(values, dtype=np.float64))
         normalized.append(normed.tolist())
-    arr = np.array(normalized, dtype=np.float32)
-
-    if cache_path:
-        Path(cache_path).parent.mkdir(parents=True, exist_ok=True)
-        with open(cache_path, "w") as f:
-            json.dump({"embeddings": [arr[i].tolist() for i in range(len(arr))]}, f, separators=(",", ":"))
-        print(f"Cached embeddings to {cache_path}")
-    return arr
+    return np.array(normalized, dtype=np.float32)
 
 
 def train_head(
@@ -192,7 +172,6 @@ def main() -> None:
     parser.add_argument("--output", default="rating-head.json", help="Output JSON path for head weights")
     parser.add_argument("--description-col", default="description", help="CSV column for description text")
     parser.add_argument("--rating-col", default="rating", help="CSV column for rating number")
-    parser.add_argument("--embedding-cache", default=None, help="Optional path to cache embeddings JSON")
     parser.add_argument("--limit", type=int, default=50, help="Max rows (default: 50). Use 0 for no limit (full CSV).")
     parser.add_argument("--val-frac", type=float, default=0.2, help="Validation fraction (0..1)")
     parser.add_argument("--epochs", type=int, default=20, help="Training epochs")
@@ -216,7 +195,7 @@ def main() -> None:
     print(f"Loaded {len(descriptions)} rows from {args.csv}")
 
     client = genai.Client(api_key=api_key)
-    X = get_embeddings(client, descriptions, args.embedding_cache)
+    X = get_embeddings(client, descriptions)
     y = np.array(ratings, dtype=np.float32)
 
     model = train_head(X, y, args.val_frac, args.epochs)

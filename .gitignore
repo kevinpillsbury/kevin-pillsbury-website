@@ -36,7 +36,6 @@ yarn-error.log*
 # training data (large / optional to commit)
 scripts/books.csv
 scripts/books-cleaned.csv
-scripts/embedding-cache.json
 
 # vercel
 .vercel
