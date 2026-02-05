@@ -113,8 +113,13 @@ export default function GenreView({ compositions, displayGenre }: GenreViewProps
 
         {/* Right column: chat (always maximized) */}
         <aside className="min-h-0 overflow-hidden">
-          <div className="flex h-full min-h-0 flex-col pt-2">
-            <ChatPanel />
+          <div className="flex h-full min-h-0 flex-col pt-2 gap-2">
+            <div className="min-h-0 flex-1 flex flex-col">
+              <ChatPanel />
+            </div>
+            <p className="shrink-0 text-xs text-[var(--text-borders)]/70 leading-snug pt-1">
+              Terrence is a RAG (Retrieval-Augmented Generation) giant space crab: he answers by retrieving chunks from my compositions that are semantically similar to your questions. Therefore, there is a positive linear relationship between the quality of his answers and the specificity of your questions.
+            </p>
           </div>
         </aside>
       </div>
