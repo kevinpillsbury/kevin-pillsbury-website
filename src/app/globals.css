@@ -26,5 +26,5 @@ body {
 }
 
 .animate-spin-counter-clockwise {
-  animation: spin-counter-clockwise 6s linear infinite;
+  animation: spin-counter-clockwise 8s linear infinite;
 }

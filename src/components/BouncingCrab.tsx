@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
-const CRAB_SIZE = 500;
-const SPEED = 2;
+const CRAB_SIZE = 450;
+const SPEED = 1;
+const EDGE_OVERSHOOT = 40; // pixels past the edge before bouncing
 
 export default function BouncingCrab() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -24,8 +25,10 @@ export default function BouncingCrab() {
 
     const animate = () => {
       const rect = container.getBoundingClientRect();
-      const maxX = rect.width - CRAB_SIZE;
-      const maxY = rect.height - CRAB_SIZE;
+      const minX = -EDGE_OVERSHOOT;
+      const maxX = rect.width - CRAB_SIZE + EDGE_OVERSHOOT;
+      const minY = -EDGE_OVERSHOOT;
+      const maxY = rect.height - CRAB_SIZE + EDGE_OVERSHOOT;
 
       let { x, y } = posRef.current;
       let { x: vx, y: vy } = velRef.current;
@@ -33,16 +36,16 @@ export default function BouncingCrab() {
       x += vx;
       y += vy;
 
-      if (x <= 0) {
-        x = 0;
+      if (x <= minX) {
+        x = minX;
         velRef.current.x = Math.abs(vx);
       } else if (x >= maxX) {
         x = maxX;
         velRef.current.x = -Math.abs(vx);
       }
 
-      if (y <= 0) {
-        y = 0;
+      if (y <= minY) {
+        y = minY;
         velRef.current.y = Math.abs(vy);
       } else if (y >= maxY) {
         y = maxY;
