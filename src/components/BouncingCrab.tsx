@@ -3,9 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
-const CRAB_SIZE = 180; // 1.5x original (120)
+const CRAB_SIZE = 140;
 const SPEED = 3;
-const SPIN_DURATION = 8; // seconds per full rotation
 
 export default function BouncingCrab() {
   const containerRef = useRef<HTMLDivElement>(null);
