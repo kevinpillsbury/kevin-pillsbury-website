@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 const CRAB_SIZE = 500;
-const SPEED = 3;
+const SPEED = 2;
 
 export default function BouncingCrab() {
   const containerRef = useRef<HTMLDivElement>(null);
