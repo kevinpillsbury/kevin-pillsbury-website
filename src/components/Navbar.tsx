@@ -69,7 +69,7 @@ const Navbar = () => {
                 href="/rate-your-synopsis"
                 className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
               >
-                Rate your synopsis
+                Rate your synopsis (Beta)
               </Link>
             </div>
             <DropdownMenu.Root>
