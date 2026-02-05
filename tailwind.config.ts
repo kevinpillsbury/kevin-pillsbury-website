@@ -18,9 +18,14 @@ const config: Config = {
           from: { transform: 'rotate(0deg)' },
           to: { transform: 'rotate(360deg)' },
         },
+        'spin-counter-clockwise': {
+          from: { transform: 'rotate(0deg)' },
+          to: { transform: 'rotate(-360deg)' },
+        },
       },
       animation: {
         'spin-slow': 'spin-slow 8s linear infinite',
+        'spin-counter-clockwise': 'spin-counter-clockwise 8s linear infinite',
       },
     },
   },

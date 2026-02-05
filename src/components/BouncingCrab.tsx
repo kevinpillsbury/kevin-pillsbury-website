@@ -3,11 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
-const CRAB_SIZE = 120;
-const SPEED = 2;
+const CRAB_SIZE = 180; // 1.5x original (120)
+const SPEED = 3;
 const SPIN_DURATION = 8; // seconds per full rotation
 
-export default function DVDBouncer() {
+export default function BouncingCrab() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const posRef = useRef({ x: 50, y: 50 });
@@ -73,7 +73,7 @@ export default function DVDBouncer() {
       }
     >
       <div
-        className="absolute animate-spin-slow"
+        className="absolute animate-spin-counter-clockwise"
         style={{
           left: "var(--crab-x)",
           top: "var(--crab-y)",
