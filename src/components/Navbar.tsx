@@ -9,7 +9,7 @@ const Navbar = () => {
   const { themes, activeTheme, setActiveThemeByName } = useTheme();
   return (
     <nav className="sticky top-0 z-50 bg-[var(--background)] border-b border-[var(--text-borders)]">
-      <div className="w-full px-4 sm:px-6 lg:px-8">
+      <div className="w-full pl-2 pr-6 sm:pl-2 sm:pr-8 lg:pl-2 lg:pr-10">
         <div className="flex items-center justify-start h-16">
           <div className="flex w-full items-center justify-between">
             <div className="flex flex-1 items-center gap-2">
@@ -66,10 +66,10 @@ const Navbar = () => {
                   </DropdownMenu.Portal>
                 </DropdownMenu.Root>
               <Link
-                href="/rate-my-synopsis"
+                href="/rate-your-synopsis"
                 className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
               >
-                Rate my synopsis
+                Rate your synopsis
               </Link>
             </div>
             <DropdownMenu.Root>
