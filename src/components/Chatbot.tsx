@@ -35,14 +35,9 @@ export function ChatPanel() {
     sendMessage,
     ensureGreeting,
     clearError,
-    setIsMinimized,
   } = useChat();
   const [input, setInput] = useState('');
   const listRef = useRef<HTMLDivElement>(null);
-
-  const onMinimize = useCallback(() => {
-    setIsMinimized(true);
-  }, [setIsMinimized]);
 
   useEffect(() => {
     listRef.current?.scrollTo(0, listRef.current.scrollHeight);
@@ -65,16 +60,6 @@ export function ChatPanel() {
 
   return (
     <div className="flex h-full min-h-0 flex-col rounded-[2.25rem] border-2 border-[var(--text-borders)] bg-[var(--bubbles)] overflow-hidden">
-      <header className="shrink-0 border-b-2 border-[var(--text-borders)] bg-[var(--bubbles)] px-4 py-2">
-        <button
-          type="button"
-          onClick={onMinimize}
-          className="w-full text-center font-serif text-sm text-[var(--text-borders)] hover:underline focus:outline-none"
-          aria-label="Minimize chat"
-        >
-          Minimize chat
-        </button>
-      </header>
       <div
         ref={listRef}
         className="min-h-0 flex-1 overflow-y-auto px-4 py-4 space-y-4"
@@ -124,7 +109,7 @@ export function ChatPanel() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask your questions here!"
-          className="min-w-0 flex-1 bg-transparent px-5 py-4 font-serif text-base text-[var(--text-borders)] placeholder-[var(--text-borders)]/70 focus:outline-none"
+          className="min-w-0 flex-1 bg-transparent px-5 py-4 font-serif text-base text-[var(--text-borders)] placeholder-[var(--text-borders)]/50 focus:outline-none"
           disabled={isLoading}
         />
         <button
@@ -140,7 +125,5 @@ export function ChatPanel() {
 }
 
 export default function Chatbot() {
-  const { isMinimized } = useChat();
-  if (isMinimized) return <MinimizedChatButton />;
   return <ChatPanel />;
 }

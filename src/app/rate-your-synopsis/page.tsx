@@ -14,7 +14,7 @@ const PAGE_DESCRIPTION = `How to use:
 Write or paste a book or story synopsis into the input field, press the "Rate" button, and a trained neural network will rate your synopsis! 
 
 How it works:
-You input a synopsis, my website takes your synopsis and makes an API request to a Google embedding model. Google's embedding model takes your synopsis, transforms it into an embedding vector, then returns that vector to my website. My website takes this embedding, and runs it through a specialized neural network I built and trained which returns a quality rating of the embedded synopsis.
+You input a synopsis, my website takes your synopsis and makes an API request to a Google embedding model. Google's embedding model takes your synopsis, transforms it into a vector embedding, then returns that embedding to my website. My website takes this embedding, and runs it through a neural network I built and trained which returns a quality rating of the embedded synopsis.
 
 How I built it:
 Rating a story's synopsis involves two distinct parts. Part A converts the synopsis into an embedding (a numerical vector), while Part B converts that embedding into a rating. Part A requires a large natural language AI model, for which I lack the training data and computing power to build from scratch. Part B is a "head"—a small, task-specific neural network added to a base model—which I do have the capacity to build. I could have downloaded a pre-trained model for Part A, but it would be too large to run on this website, it would require a second server and an API to connect to it. Instead, I am using Google's state-of-the-art embedding model via their API. For Part B, I found a dataset of ~100k book descriptions and their corresponding Goodreads ratings. Using TensorFlow, I trained a small neural network (the head) to take a synopsis embedding and generate a rating. During training, I used the Google API to embed the descriptions to ensure consistency with how I process user synopses. My neural network head is small enough to run locally on this website, eliminating the need for a second server.`;
@@ -66,35 +66,38 @@ export default function RateYourSynopsisPage() {
           </div>
         </aside>
 
-        {/* Center: synopsis input full height (like genre content) + button row */}
+        {/* Center: synopsis input + Rate button to the right, kept low */}
         <section className="min-h-0 flex flex-col gap-4">
-          <div className="flex-1 min-h-0 overflow-hidden flex justify-center">
-            <div className="w-full max-w-3xl flex flex-col min-h-0">
+          <div className="flex-1 min-h-0 flex justify-center gap-3 items-end">
+            <div className="w-full max-w-3xl flex flex-col min-h-0 min-w-0">
               <div className="flex-1 min-h-0 overflow-hidden rounded-[3.25rem] border border-[var(--text-borders)] bg-[var(--bubbles)]">
                 <div className="h-full min-h-0 overflow-hidden p-6 sm:p-8 flex flex-col">
                   <textarea
                     value={synopsis}
                     onChange={(e) => setSynopsis(e.target.value)}
                     placeholder="Paste or type a book/story synopsis here..."
-                    className="w-full h-full min-h-0 bg-transparent text-[var(--text-borders)] placeholder:text-[var(--text-borders)]/90 placeholder:text-lg font-serif text-lg leading-relaxed resize-none focus:outline-none overflow-y-auto"
+                    className="w-full h-full min-h-0 bg-transparent text-[var(--text-borders)] placeholder:text-[var(--text-borders)]/50 placeholder:text-lg font-serif text-lg leading-relaxed resize-none focus:outline-none overflow-y-auto"
                     disabled={loading}
                   />
                 </div>
               </div>
             </div>
-          </div>
-          <div className="flex justify-end items-center gap-3 flex-shrink-0">
-            {error && (
-              <p className="text-sm text-[var(--text-borders)]/80 mr-auto">{error}</p>
-            )}
             <button
               type="button"
               onClick={handleSubmit}
               disabled={loading || !synopsis.trim()}
-              className="px-6 py-3 rounded-md text-[var(--text-borders)] font-medium bg-[var(--bubbles)] border border-[var(--text-borders)] hover:opacity-90 disabled:opacity-50 focus:outline-none outline-none"
+              className="shrink-0 px-6 py-3 rounded-md text-[var(--text-borders)] font-medium bg-[var(--bubbles)] border border-[var(--text-borders)] hover:opacity-90 disabled:opacity-50 focus:outline-none outline-none"
             >
               Rate
             </button>
+          </div>
+          <div className="flex items-center gap-3 flex-shrink-0">
+            {error && (
+              <p className="text-sm text-[var(--text-borders)]/80 mr-auto">{error}</p>
+            )}
+            <p className="text-xs text-[var(--text-borders)]/70 mr-auto">
+              At least 15 words recommended; very short synopses are down-rated.
+            </p>
           </div>
         </section>
 

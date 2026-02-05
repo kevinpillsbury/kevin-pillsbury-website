@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Composition } from '@prisma/client';
 import { useChat } from '@/lib/chat-context';
-import { MinimizedChatButton, ChatPanel } from '@/components/Chatbot';
+import { ChatPanel } from '@/components/Chatbot';
 
 type GenreViewProps = {
   compositions: Pick<Composition, 'id' | 'title' | 'content'>[];
@@ -11,7 +11,7 @@ type GenreViewProps = {
 };
 
 export default function GenreView({ compositions, displayGenre }: GenreViewProps) {
-  const { setCurrentContext, isMinimized } = useChat();
+  const { setCurrentContext } = useChat();
   const [selectedCompositionId, setSelectedCompositionId] = useState<string | null>(null);
 
   const selectedComposition = compositions.find((c) => c.id === selectedCompositionId);
@@ -101,7 +101,7 @@ export default function GenreView({ compositions, displayGenre }: GenreViewProps
                   </>
                 ) : (
                   <div className="h-full min-h-[240px] flex items-start justify-center pt-10">
-                    <p className="font-serif text-lg text-[var(--text-borders)]/90">
+                    <p className="font-serif text-lg text-[var(--text-borders)]/50">
                       No composition selected.
                     </p>
                   </div>
@@ -111,18 +111,10 @@ export default function GenreView({ compositions, displayGenre }: GenreViewProps
           </div>
         </section>
 
-        {/* Right column: chat (width stays fixed; content swaps when minimized) */}
+        {/* Right column: chat (always maximized) */}
         <aside className="min-h-0 overflow-hidden">
-          <div className="flex h-full min-h-0 flex-col">
-            {!isMinimized ? (
-              <div className="h-full min-h-0 pt-2">
-                <ChatPanel />
-              </div>
-            ) : (
-              <div className="h-full min-h-0 flex items-end justify-end pb-6">
-                <MinimizedChatButton />
-              </div>
-            )}
+          <div className="flex h-full min-h-0 flex-col pt-2">
+            <ChatPanel />
           </div>
         </aside>
       </div>
