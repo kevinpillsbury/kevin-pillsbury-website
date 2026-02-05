@@ -10,7 +10,7 @@ function ratingToLabel(rating: number): string {
   return 'Needs work';
 }
 
-const PAGE_DESCRIPTION = `How to use:
+const PAGE_DESCRIPTION = `What is this:
 Write or paste a book or story synopsis into the input field, press the "Rate" button, and a trained neural network will rate your synopsis! 
 
 How it works:
