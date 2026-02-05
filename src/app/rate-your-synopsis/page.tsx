@@ -66,35 +66,35 @@ export default function RateYourSynopsisPage() {
           </div>
         </aside>
 
-        {/* Center: synopsis input full height + button row */}
-        <section className="min-h-0 flex flex-col gap-4">
+        {/* Center: synopsis input + Rate button to the right at bottom */}
+        <section className="min-h-0 flex flex-col">
           <div className="flex-1 min-h-0 overflow-hidden flex justify-center">
-            <div className="w-full max-w-3xl flex flex-col min-h-0">
+            <div className="w-full max-w-3xl flex gap-4 items-stretch min-h-0">
               <div className="flex-1 min-h-0 overflow-hidden rounded-[3.25rem] border border-[var(--text-borders)] bg-[var(--bubbles)]">
                 <div className="h-full min-h-0 overflow-hidden p-6 sm:p-8 flex flex-col">
                   <textarea
                     value={synopsis}
                     onChange={(e) => setSynopsis(e.target.value)}
                     placeholder="Paste or type a book/story synopsis here..."
-                    className="w-full h-full min-h-0 bg-transparent text-[var(--text-borders)] placeholder:text-[var(--text-borders)]/90 placeholder:text-lg font-serif text-lg leading-relaxed resize-none focus:outline-none overflow-y-auto"
+                    className="w-full h-full min-h-0 bg-transparent text-[var(--text-borders)] placeholder:text-[var(--text-borders)]/50 placeholder:text-lg font-serif text-lg leading-relaxed resize-none focus:outline-none overflow-y-auto"
                     disabled={loading}
                   />
                 </div>
               </div>
+              <div className="flex flex-col justify-end gap-2 flex-shrink-0 pb-1">
+                {error && (
+                  <p className="text-sm text-[var(--text-borders)]/80">{error}</p>
+                )}
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={loading || !synopsis.trim()}
+                  className="px-6 py-3 rounded-md text-[var(--text-borders)] font-medium bg-[var(--bubbles)] border border-[var(--text-borders)] hover:opacity-90 disabled:opacity-50 focus:outline-none outline-none"
+                >
+                  Rate
+                </button>
+              </div>
             </div>
-          </div>
-          <div className="flex justify-end items-center gap-3 flex-shrink-0">
-            {error && (
-              <p className="text-sm text-[var(--text-borders)]/80 mr-auto">{error}</p>
-            )}
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={loading || !synopsis.trim()}
-              className="px-6 py-3 rounded-md text-[var(--text-borders)] font-medium bg-[var(--bubbles)] border border-[var(--text-borders)] hover:opacity-90 disabled:opacity-50 focus:outline-none outline-none"
-            >
-              Rate
-            </button>
           </div>
         </section>
 
