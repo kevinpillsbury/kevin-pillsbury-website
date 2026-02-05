@@ -10,23 +10,23 @@ function ratingToLabel(rating: number): string {
   return 'Needs work';
 }
 
-const PAGE_DESCRIPTION = `What this is
-You can paste a book or story description (a “plot” or blurb) and get a predicted rating. The result is a qualitative label (e.g. “Good”, “Very Good”) based on patterns learned from book descriptions and ratings.
+const PAGE_DESCRIPTION = `How to use:
+Write or paste a book or story synopsis into the input field, press the "Rate" button, and a trained neural network will rate your synopsis! 
 
-How it works
-Your text is turned into a vector using the same embedding model used elsewhere on the site. A small trained “head” (linear model) maps that vector to a number, which is then mapped to a label (Best Seller, Very Good, Good, Decent, Needs work). No large language model is used for the rating—only the embedding and the head.
+How it works:
+You input a synopsis, my website takes your synopsis and makes an API request to a Google embedding model. Google's embedding model takes your synopsis, transforms it into an embedding vector, then returns that vector to my website. My website takes this embedding, and runs it through a specialized neural network I built and trained which returns a quality rating of the embedded synopsis.
 
-How it was built
-Descriptions and ratings were taken from a large public dataset, cleaned, and embedded with the Gemini embedding API. A linear layer (768 → 1) was trained on those embeddings to predict rating, then the weights were exported to JSON. The site embeds your description the same way, runs it through the head, and shows the label. For more detail, see the feature plan in the repo.`;
+How I built it:
+Rating a story's synopsis involves two distinct parts. Part A converts the synopsis into an embedding (a numerical vector), while Part B converts that embedding into a rating. Part A requires a large natural language AI model, for which I lack the training data and computing power to build from scratch. Part B is a "head"—a small, task-specific neural network added to a base model—which I do have the capacity to build. I could have downloaded a pre-trained model for Part A, but it would be too large to run on this website, it would require a second server and an API to connect to it. Instead, I am using Google's state-of-the-art embedding model via their API. For Part B, I found a dataset of ~100k book descriptions and their corresponding Goodreads ratings. Using TensorFlow, I trained a small neural network (the head) to take a synopsis embedding and generate a rating. During training, I used the Google API to embed the descriptions to ensure consistency with how I process user synopses. My neural network head is small enough to run locally on this website, eliminating the need for a second server.`;
 
-export default function RateMyPlotPage() {
-  const [plot, setPlot] = useState('');
+export default function RateMySynopsisPage() {
+  const [synopsis, setSynopsis] = useState('');
   const [ratingNum, setRatingNum] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    if (!plot.trim()) return;
+    if (!synopsis.trim()) return;
     setError(null);
     setLoading(true);
     setRatingNum(null);
@@ -34,7 +34,7 @@ export default function RateMyPlotPage() {
       const res = await fetch('/api/rate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description: plot.trim() }),
+        body: JSON.stringify({ description: synopsis.trim() }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -66,14 +66,14 @@ export default function RateMyPlotPage() {
           </div>
         </aside>
 
-        {/* Center: plot input (same style as story content) + button */}
+        {/* Center: synopsis input (same style as story content) + button */}
         <section className="flex flex-col gap-4 min-h-0 flex-1 flex">
           <div className="rounded-[3.25rem] border border-[var(--text-borders)] bg-[var(--bubbles)] min-h-[400px] flex flex-col overflow-hidden">
             <div className="flex-1 min-h-0 p-6 sm:p-8 overflow-hidden flex flex-col">
               <textarea
-                value={plot}
-                onChange={(e) => setPlot(e.target.value)}
-                placeholder="Paste or type a book/story plot here..."
+                value={synopsis}
+                onChange={(e) => setSynopsis(e.target.value)}
+                placeholder="Paste or type a book/story synopsis here..."
                 className="w-full h-full min-h-[240px] bg-transparent text-[var(--text-borders)] placeholder:text-[var(--text-borders)]/90 placeholder:text-lg font-serif text-lg leading-relaxed resize-none focus:outline-none overflow-y-auto"
                 disabled={loading}
               />
@@ -86,7 +86,7 @@ export default function RateMyPlotPage() {
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={loading || !plot.trim()}
+              disabled={loading || !synopsis.trim()}
               className="px-6 py-3 rounded-md text-[var(--text-borders)] font-medium bg-[var(--bubbles)] border border-[var(--text-borders)] hover:opacity-90 disabled:opacity-50 focus:outline-none outline-none"
             >
               Rate

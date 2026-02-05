@@ -23,7 +23,7 @@
   {
     "name": "Balkan",
     "background": "#919191",
-    "text-borders": "#FFFFFF",
+    "text-borders": "#000000",
     "bubbles": "#B3B3B3"
   }
 ]

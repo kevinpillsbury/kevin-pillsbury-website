@@ -33,7 +33,7 @@ import pandas as pd
 import tensorflow as tf
 from google import genai
 from google.genai import types
-from google.genai.errors import ClientError
+from google.genai.errors import ClientError, ServerError
 
 # Must match production (Node): gemini-embedding-001, 768 dim, RETRIEVAL_QUERY, L2-normalized.
 EMBEDDING_MODEL = "gemini-embedding-001"
@@ -95,6 +95,7 @@ def get_embeddings(
         end = min(start + chunk_size, n)
         print(f"  Embedding descriptions {start + 1}-{end} of {n}...")
         chunk = descriptions[start:end]
+        retry_count = 0
         while True:
             try:
                 result = client.models.embed_content(
@@ -103,10 +104,29 @@ def get_embeddings(
                     config=config,
                 )
                 break
-            except ClientError as e:
-                if e.status_code == 429:  # RESOURCE_EXHAUSTED (rate limit)
+            except (ClientError, ServerError) as e:
+                retry_count += 1
+                status = getattr(e, "status_code", None)
+                if status is None and getattr(e, "args", None):
+                    status = e.args[0] if isinstance(e.args[0], int) else None
+                msg = getattr(e, "message", None) or str(e)
+                if status == 429:  # RESOURCE_EXHAUSTED (rate limit)
                     wait = 5.0
-                    print(f"  Rate limited (429). Waiting {wait:.0f}s then retrying...")
+                    print(f"  Got error {status} ({msg}). Retry #{retry_count}. Retrying in {wait:.0f} seconds...")
+                elif status == 503 or (status is not None and 500 <= status < 600):  # UNAVAILABLE or other 5xx
+                    wait = 15.0
+                    print(f"  Got error {status} ({msg}). Retry #{retry_count}. Retrying in {wait:.0f} seconds...")
+                else:
+                    raise
+                time.sleep(wait)
+                continue
+            except Exception as e:
+                # Catch any other API/network error that might be retryable (e.g. 503 wrapped differently)
+                err_str = str(e).upper()
+                if "503" in err_str or "UNAVAILABLE" in err_str or "SERVICE" in err_str:
+                    retry_count += 1
+                    wait = 15.0
+                    print(f"  Got error ({e}). Retry #{retry_count}. Retrying in {wait:.0f} seconds...")
                     time.sleep(wait)
                     continue
                 raise

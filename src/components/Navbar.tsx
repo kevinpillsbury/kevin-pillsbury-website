@@ -12,7 +12,7 @@ const Navbar = () => {
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-start h-16">
           <div className="flex w-full items-center justify-between">
-            <div className="flex flex-1 items-center justify-between max-w-2xl">
+            <div className="flex flex-1 items-center gap-2">
               <Link
                 href="/"
                 className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
@@ -66,10 +66,10 @@ const Navbar = () => {
                   </DropdownMenu.Portal>
                 </DropdownMenu.Root>
               <Link
-                href="/rate-my-plot"
+                href="/rate-my-synopsis"
                 className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
               >
-                Rate my plot
+                Rate my synopsis
               </Link>
             </div>
             <DropdownMenu.Root>
