@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
-const CRAB_SIZE = 140;
+const CRAB_SIZE = 500;
 const SPEED = 3;
 
 export default function BouncingCrab() {
