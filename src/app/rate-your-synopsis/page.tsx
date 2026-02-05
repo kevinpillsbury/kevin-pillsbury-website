@@ -68,8 +68,8 @@ export default function RateYourSynopsisPage() {
 
         {/* Center: synopsis input + Rate button to the right at bottom */}
         <section className="min-h-0 flex flex-col">
-          <div className="flex-1 min-h-0 overflow-hidden flex justify-center">
-            <div className="w-full max-w-3xl flex gap-4 items-stretch min-h-0">
+          <div className="flex-1 min-h-0 overflow-hidden flex w-full">
+            <div className="w-full flex gap-4 items-stretch min-h-0">
               <div className="flex-1 min-h-0 overflow-hidden rounded-[3.25rem] border border-[var(--text-borders)] bg-[var(--bubbles)]">
                 <div className="h-full min-h-0 overflow-hidden p-6 sm:p-8 flex flex-col">
                   <textarea
