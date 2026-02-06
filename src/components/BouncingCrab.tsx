@@ -6,8 +6,8 @@ import Image from "next/image";
 const CRAB_SIZE = 450;
 const SPEED = 1.5;
 const EDGE_OVERSHOOT = 80;
-const TELEPORT_DURATION_MS = 2000;
-const TELEPORT_LEAD_TIME_SEC = 10;
+const TELEPORT_DURATION_MS = 1000;
+const TELEPORT_LEAD_TIME_SEC = 6;
 const FPS = 60;
 
 type Bounds = { minX: number; maxX: number; minY: number; maxY: number };
@@ -172,7 +172,8 @@ export default function BouncingCrab() {
 
   const renderCrab = (
     position: "main" | "new" | { x: number; y: number },
-    opacity: number
+    opacity: number,
+    isFading: boolean
   ) => (
     <div
       className="absolute animate-spin-counter-clockwise cursor-pointer select-none"
@@ -192,7 +193,9 @@ export default function BouncingCrab() {
         width: CRAB_SIZE,
         height: CRAB_SIZE,
         opacity,
-        transition: `opacity ${TELEPORT_DURATION_MS}ms ease-in-out`,
+        transition: isFading
+          ? `opacity ${TELEPORT_DURATION_MS}ms ease-in-out`
+          : "none",
         pointerEvents: isTransitioning ? "none" : "auto",
       }}
       onClick={handleCrabClick}
@@ -226,10 +229,12 @@ export default function BouncingCrab() {
         } as React.CSSProperties
       }
     >
-      {renderCrab("main", isTransitioning && fadeOut ? 0 : 1)}
-      {isTransitioning && (
-        renderCrab("new", fadeIn ? 1 : 0)
+      {renderCrab(
+        "main",
+        isTransitioning && fadeOut ? 0 : 1,
+        isTransitioning
       )}
+      {isTransitioning && renderCrab("new", fadeIn ? 1 : 0, true)}
     </div>
   );
 }
