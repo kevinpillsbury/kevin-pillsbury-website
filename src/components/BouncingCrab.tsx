@@ -5,7 +5,7 @@ import Image from "next/image";
 
 const CRAB_SIZE = 450;
 const SPEED = 1;
-const EDGE_OVERSHOOT = 40; // pixels past the edge before bouncing
+const EDGE_OVERSHOOT = 80; // pixels past the edge before bouncing
 
 export default function BouncingCrab() {
   const containerRef = useRef<HTMLDivElement>(null);

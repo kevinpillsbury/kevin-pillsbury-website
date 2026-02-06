@@ -1,8 +1,10 @@
 import BouncingCrab from "@/components/BouncingCrab";
+import DisableScroll from "@/components/DisableScroll";
 
 export default function Home() {
   return (
-    <div className="relative min-h-[calc(100vh-8rem)]">
+    <DisableScroll>
+    <div className="relative h-[calc(100vh-8rem)] overflow-hidden">
       {/* Background - below navbar only */}
       <div
         className="fixed top-16 inset-x-0 bottom-0 -z-10 bg-cover bg-center bg-no-repeat"
@@ -21,5 +23,6 @@ export default function Home() {
         </div>
       </div>
     </div>
+    </DisableScroll>
   );
 }
