@@ -16,3 +16,6 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 - [Gemini API](https://ai.google.dev/gemini-api) (via [`@google/genai`](https://www.npmjs.com/package/@google/genai))
 - [Vercel](https://vercel.com)
 - [ESLint](https://eslint.org)
+
+## Images
+- [Adobe Stock](https://stock.adobe.com/)
