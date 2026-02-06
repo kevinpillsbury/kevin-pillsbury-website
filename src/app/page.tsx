@@ -10,8 +10,8 @@ export default function Home() {
         className="fixed top-16 inset-x-0 bottom-0 -z-10 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url(/images/cartoon-space.jpg)" }}
       />
-      {/* Bouncing crab */}
-      <div className="fixed top-16 inset-x-0 bottom-0 z-0 overflow-hidden">
+      {/* Bouncing crab - z-20 so it's clickable above content */}
+      <div className="fixed top-16 inset-x-0 bottom-0 z-20 overflow-hidden">
         <BouncingCrab />
       </div>
       {/* Content overlay */}
