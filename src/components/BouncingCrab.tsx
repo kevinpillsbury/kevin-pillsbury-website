@@ -7,8 +7,9 @@ const CRAB_SIZE = 450;
 const SPEED = 1.5;
 const EDGE_OVERSHOOT = 80;
 const TELEPORT_DURATION_MS = 1000;
-const TELEPORT_LEAD_TIME_SEC = 6;
+const TELEPORT_LEAD_TIME_SEC = 12;
 const FPS = 60;
+const SPIN_DURATION_MS = 15000; // ms per full rotation (counter-clockwise)
 
 type Bounds = { minX: number; maxX: number; minY: number; maxY: number };
 
@@ -69,6 +70,7 @@ export default function BouncingCrab() {
   const newCrabPosRef = useRef<{ x: number; y: number } | null>(null);
   const newCrabVelRef = useRef<{ x: number; y: number } | null>(null);
   const animationRef = useRef<number | null>(null);
+  const rotationStartTimeRef = useRef<number | null>(null);
 
   const getBounds = useCallback((): Bounds | null => {
     if (!containerRef.current) return null;
@@ -131,9 +133,16 @@ export default function BouncingCrab() {
 
     const container = containerRef.current;
 
-    const animate = () => {
+    const animate = (timestamp: number) => {
       const bounds = getBounds();
       if (!bounds) return;
+
+      if (rotationStartTimeRef.current === null) {
+        rotationStartTimeRef.current = timestamp;
+      }
+      const elapsed = timestamp - rotationStartTimeRef.current;
+      const rotationDeg = (-360 * (elapsed % SPIN_DURATION_MS)) / SPIN_DURATION_MS;
+      container.style.setProperty("--crab-rotation", `${rotationDeg}deg`);
 
       // Update main crab (fading out during transition)
       const mainResult = stepPhysics(
@@ -176,8 +185,9 @@ export default function BouncingCrab() {
     isFading: boolean
   ) => (
     <div
-      className="absolute animate-spin-counter-clockwise cursor-pointer select-none"
+      className="absolute cursor-pointer select-none"
       style={{
+        transform: "rotate(var(--crab-rotation, 0deg))",
         left:
           position === "main"
             ? "var(--crab-x)"
@@ -224,6 +234,7 @@ export default function BouncingCrab() {
         {
           "--crab-x": "50px",
           "--crab-y": "50px",
+          "--crab-rotation": "0deg",
           "--new-crab-x": "50px",
           "--new-crab-y": "50px",
         } as React.CSSProperties
