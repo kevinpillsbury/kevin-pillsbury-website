@@ -8,7 +8,7 @@ export default function Home() {
       {/* Background - below navbar only */}
       <div
         className="fixed top-16 inset-x-0 bottom-0 -z-10 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url(/images/cartoon-space.jpg)" }}
+        style={{ backgroundImage: "url(/images/space.png)" }}
       />
       {/* Bouncing crab - behind text */}
       <div className="fixed top-16 inset-x-0 bottom-0 z-10 overflow-hidden">

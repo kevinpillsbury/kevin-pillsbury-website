@@ -3,13 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
-const CRAB_SIZE = 100;
-const SPEED = 1.5;
-const EDGE_OVERSHOOT = 80;
+const CRAB_SIZE = 125;
+const SPEED = 2;
+const EDGE_OVERSHOOT = 20;
 const TELEPORT_DURATION_MS = 1000;
 const TELEPORT_LEAD_TIME_SEC = 12;
 const FPS = 60;
-const SPIN_DURATION_MS = 15000; // ms per full rotation (counter-clockwise)
+const SPIN_DURATION_MS = 9000; // ms per full rotation (counter-clockwise)
 
 type Bounds = { minX: number; maxX: number; minY: number; maxY: number };
 
