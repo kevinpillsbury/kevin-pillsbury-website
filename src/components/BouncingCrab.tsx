@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
-const CRAB_SIZE = 450;
+const CRAB_SIZE = 100;
 const SPEED = 1.5;
 const EDGE_OVERSHOOT = 80;
 const TELEPORT_DURATION_MS = 1000;
