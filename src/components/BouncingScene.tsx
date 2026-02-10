@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const BALL_RADII = [42, 95, 32, 45, 38, 56, 42, 60, 37, 76, 34, 140, 50, 25, 32, 38];
+const BALL_RADII = [49, 95, 55, 56, 60, 76, 88, 140, 50, 70, 90];
 const BASE_SPEED = 2;
 const TELEPORT_FADE_MS = 600;
 const EDGE_PADDING = 5;
@@ -16,58 +16,81 @@ type Entity = {
   y: number;
   vx: number;
   vy: number;
-  radius: number;
+  radius: number; // half side length of the square
   fadingOut: boolean;
   opacity: number;
 };
 
-function distance(x1: number, y1: number, x2: number, y2: number) {
-  return Math.hypot(x2 - x1, y2 - y1);
+/** Box bounds (entity center + half-size). */
+function getBoxBounds(e: Entity) {
+  return {
+    minX: e.x - e.radius,
+    maxX: e.x + e.radius,
+    minY: e.y - e.radius,
+    maxY: e.y + e.radius,
+  };
 }
 
-function resolveElasticCollision(
-  e1: Entity,
-  e2: Entity,
-  dx: number,
-  dy: number,
-  dist: number
+/** AABB overlap: returns overlap amounts; both > 0 means collision. */
+function aabbOverlap(
+  a: { minX: number; maxX: number; minY: number; maxY: number },
+  b: { minX: number; maxX: number; minY: number; maxY: number }
 ) {
-  if (dist <= 0) return;
-  const distSq = dist * dist;
-  const m1 = Math.PI * e1.radius * e1.radius;
-  const m2 = Math.PI * e2.radius * e2.radius;
-  // Wikipedia elastic collision: v' = v - (2m_other/(m1+m2)) * <v-v_other|center_diff> / |center_diff|^2 * center_diff
-  // dx,dy = x2-x1 (from e1 to e2). For v'1 we use (x1-x2) = (-dx,-dy)
-  const dvx = e1.vx - e2.vx;
-  const dvy = e1.vy - e2.vy;
-  const dot = (-dx) * dvx + (-dy) * dvy; // (x1-x2)·(v1-v2), negative when approaching
-  if (dot >= 0) return; // moving apart
-  const f1 = ((2 * m2) / (m1 + m2)) * (dot / distSq);
-  e1.vx += f1 * dx; // v1 - f1*(x1-x2) = v1 + f1*(dx,dy) since x1-x2=(-dx,-dy)
-  e1.vy += f1 * dy;
-  const f2 = ((2 * m1) / (m1 + m2)) * (dot / distSq); // same dot for v2
-  e2.vx -= f2 * dx; // v2 - f2*(x2-x1)
-  e2.vy -= f2 * dy;
+  const overlapX = Math.min(a.maxX, b.maxX) - Math.max(a.minX, b.minX);
+  const overlapY = Math.min(a.maxY, b.maxY) - Math.max(a.minY, b.minY);
+  return { overlapX, overlapY };
 }
 
-function separateOverlap(
-  e1: Entity,
-  e2: Entity,
-  dx: number,
-  dy: number,
-  dist: number,
-  overlap: number
-) {
-  if (dist === 0) return;
-  const nx = dx / dist;
-  const ny = dy / dist;
-  const m1 = Math.PI * e1.radius * e1.radius;
-  const m2 = Math.PI * e2.radius * e2.radius;
+/** Mass proportional to area of square (side = 2*radius). */
+function mass(e: Entity) {
+  return 4 * e.radius * e.radius;
+}
+
+/** Separate two overlapping AABBs along the axis of smallest penetration (push apart by mass ratio). */
+function separateAABB(e1: Entity, e2: Entity, overlapX: number, overlapY: number) {
+  const m1 = mass(e1);
+  const m2 = mass(e2);
   const totalM = m1 + m2;
-  e1.x -= (overlap * m2 / totalM) * nx;
-  e1.y -= (overlap * m2 / totalM) * ny;
-  e2.x += (overlap * m1 / totalM) * nx;
-  e2.y += (overlap * m1 / totalM) * ny;
+  if (overlapX < overlapY) {
+    const push = overlapX;
+    if (e1.x < e2.x) {
+      e1.x -= (push * m2) / totalM;
+      e2.x += (push * m1) / totalM;
+    } else {
+      e1.x += (push * m2) / totalM;
+      e2.x -= (push * m1) / totalM;
+    }
+  } else {
+    const push = overlapY;
+    if (e1.y < e2.y) {
+      e1.y -= (push * m2) / totalM;
+      e2.y += (push * m1) / totalM;
+    } else {
+      e1.y += (push * m2) / totalM;
+      e2.y -= (push * m1) / totalM;
+    }
+  }
+}
+
+/** Elastic collision response along one axis (1D formula). Normal is +1 or -1 on that axis. */
+function resolveElasticAABB(
+  e1: Entity,
+  e2: Entity,
+  axis: "x" | "y"
+) {
+  const m1 = mass(e1);
+  const m2 = mass(e2);
+  const v1 = axis === "x" ? e1.vx : e1.vy;
+  const v2 = axis === "x" ? e2.vx : e2.vy;
+  const v1New = (v1 * (m1 - m2) + 2 * m2 * v2) / (m1 + m2);
+  const v2New = (v2 * (m2 - m1) + 2 * m1 * v1) / (m1 + m2);
+  if (axis === "x") {
+    e1.vx = v1New;
+    e2.vx = v2New;
+  } else {
+    e1.vy = v1New;
+    e2.vy = v2New;
+  }
 }
 
 export default function BouncingScene() {
@@ -88,6 +111,16 @@ export default function BouncingScene() {
     };
   }, []);
 
+  /** AABB overlap: two boxes (centers x,y and x2,y2 with half-sizes r and e.radius) overlap iff both axes overlap. */
+  const boxesOverlap = useCallback(
+    (x: number, y: number, r: number, ex: number, ey: number, er: number) => {
+      return (
+        Math.abs(x - ex) < r + er && Math.abs(y - ey) < r + er
+      );
+    },
+    []
+  );
+
   const getRandomUnoccupiedPosition = useCallback(
     (radius: number, excludeId: string): { x: number; y: number } | null => {
       const bounds = getBounds();
@@ -106,8 +139,7 @@ export default function BouncingScene() {
         let ok = true;
         for (const e of others) {
           if (e.fadingOut) continue;
-          const d = distance(x, y, e.x, e.y);
-          if (d < radius + e.radius + padding) {
+          if (boxesOverlap(x, y, radius + padding, e.x, e.y, e.radius)) {
             ok = false;
             break;
           }
@@ -116,7 +148,7 @@ export default function BouncingScene() {
       }
       return null;
     },
-    [getBounds]
+    [getBounds, boxesOverlap]
   );
 
   const initEntities = useCallback(() => {
@@ -134,7 +166,7 @@ export default function BouncingScene() {
         y = bounds.minY + r + Math.random() * (bounds.maxY - bounds.minY - 2 * r);
         ok = true;
         for (const e of entities) {
-          if (distance(x, y, e.x, e.y) < r + e.radius + 10) {
+          if (Math.abs(x - e.x) < r + e.radius + 10 && Math.abs(y - e.y) < r + e.radius + 10) {
             ok = false;
             break;
           }
@@ -231,16 +263,13 @@ export default function BouncingScene() {
           const e1 = entities[i];
           const e2 = entities[j];
           if (e1.fadingOut || e2.fadingOut) continue;
-          const dx = e2.x - e1.x;
-          const dy = e2.y - e1.y;
-          const dist = distance(e1.x, e1.y, e2.x, e2.y);
-          const overlap = e1.radius + e2.radius - dist;
-          if (overlap > 0) {
-            separateOverlap(e1, e2, dx, dy, dist || 0.001, overlap);
-            const newDx = e2.x - e1.x;
-            const newDy = e2.y - e1.y;
-            const newDist = distance(e1.x, e1.y, e2.x, e2.y);
-            resolveElasticCollision(e1, e2, newDx, newDy, newDist || 0.001);
+          const b1 = getBoxBounds(e1);
+          const b2 = getBoxBounds(e2);
+          const { overlapX, overlapY } = aabbOverlap(b1, b2);
+          if (overlapX > 0 && overlapY > 0) {
+            separateAABB(e1, e2, overlapX, overlapY);
+            const axis: "x" | "y" = overlapX < overlapY ? "x" : "y";
+            resolveElasticAABB(e1, e2, axis);
           }
         }
       }
