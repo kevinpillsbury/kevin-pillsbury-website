@@ -1,23 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
 
-const CRAB_SIZE = 125;
-const CRAB_RADIUS = CRAB_SIZE / 2;
-const BALL_RADII = [
-  14, 16, 18, 20, 23, 26, 29, 32, 35, 38, 40, 42, 45,
-  16, 22, 28, 34, 40, 18, 25, 32, 38, 21,
-]; // 21 balls, radii 14–45
+const BALL_RADII = [42, 95, 32, 45, 38, 56, 42, 60, 37, 76, 34, 140, 50, 25, 32, 38];
 const BASE_SPEED = 2;
-const TELEPORT_FADE_MS = 800;
+const TELEPORT_FADE_MS = 600;
 const EDGE_PADDING = 5;
 
 type Bounds = { minX: number; maxX: number; minY: number; maxY: number };
 
 type Entity = {
   id: string;
-  type: "ball" | "crab";
+  type: "ball";
   x: number;
   y: number;
   vx: number;
@@ -80,7 +74,7 @@ function separateOverlap(
 export default function BouncingScene() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
-  const [entityDefs, setEntityDefs] = useState<{ id: string; type: "ball" | "crab"; radius: number }[]>([]);
+  const [entityDefs, setEntityDefs] = useState<{ id: string; type: "ball"; radius: number }[]>([]);
   const entitiesRef = useRef<Entity[]>([]);
   const animationRef = useRef<number | null>(null);
 
@@ -131,20 +125,6 @@ export default function BouncingScene() {
     if (!bounds) return;
 
     const entities: Entity[] = [];
-    const angle = () => (Math.random() * 2 - 1) * Math.PI * 0.5;
-
-    const crab: Entity = {
-      id: "crab",
-      type: "crab",
-      x: bounds.minX + (bounds.maxX - bounds.minX) * 0.5,
-      y: bounds.minY + (bounds.maxY - bounds.minY) * 0.5,
-      vx: BASE_SPEED * Math.cos(angle()),
-      vy: BASE_SPEED * Math.sin(angle()),
-      radius: CRAB_RADIUS,
-      fadingOut: false,
-      opacity: 1,
-    };
-    entities.push(crab);
 
     for (let i = 0; i < BALL_RADII.length; i++) {
       const r = BALL_RADII[i];
@@ -292,10 +272,7 @@ export default function BouncingScene() {
       style={{ backgroundColor: "var(--bubbles)" } as React.CSSProperties}
     >
       {/* Entities */}
-      {entityDefs.map((def) => {
-        const full = entitiesRef.current.find((x) => x.id === def.id);
-        const fadingOut = full?.fadingOut ?? false;
-        return def.type === "ball" ? (
+      {entityDefs.map((def) => (
           <div
             key={def.id}
             className="absolute rounded-xl cursor-pointer"
@@ -316,36 +293,7 @@ export default function BouncingScene() {
               if (ev.key === "Enter" || ev.key === " ") handleEntityClick(def.id);
             }}
           />
-        ) : (
-          <div
-            key={def.id}
-            className="absolute cursor-pointer"
-            style={{
-              left: `var(--${def.id}-x, 0)`,
-              top: `var(--${def.id}-y, 0)`,
-              width: CRAB_SIZE,
-              height: CRAB_SIZE,
-              opacity: `var(--${def.id}-opacity, 1)`,
-              transition: "none",
-            }}
-            onClick={() => handleEntityClick(def.id)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(ev) => {
-              if (ev.key === "Enter" || ev.key === " ") handleEntityClick(def.id);
-            }}
-          >
-            <Image
-              src="/images/cartoon-crab.png"
-              alt="Terrence the crab"
-              width={CRAB_SIZE}
-              height={CRAB_SIZE}
-              className="w-full h-full object-contain pointer-events-none"
-              draggable={false}
-            />
-          </div>
-        );
-      })}
+      ))}
     </div>
   );
 }
