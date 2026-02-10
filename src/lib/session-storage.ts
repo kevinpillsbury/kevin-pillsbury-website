@@ -16,6 +16,10 @@ export type Session = {
   chatMessages?: Array<{ role: string; content: string }>;
   bouncingBlockTitles?: string[];
   bouncingBlockAssignments?: BouncingBlockAssignment[];
+  pendingComposition?: {
+    genreSlug: string;
+    id: string;
+  };
 };
 
 function parseSession(raw: string | null): Session {
@@ -48,6 +52,19 @@ function parseSession(raw: string | null): Session {
           typeof (a as BouncingBlockAssignment).title === "string" &&
           typeof (a as BouncingBlockAssignment).genreSlug === "string"
       );
+    }
+    if (
+      obj.pendingComposition &&
+      typeof obj.pendingComposition === "object" &&
+      typeof (obj.pendingComposition as { genreSlug?: unknown }).genreSlug ===
+        "string" &&
+      typeof (obj.pendingComposition as { id?: unknown }).id === "string"
+    ) {
+      const pc = obj.pendingComposition as { genreSlug: string; id: string };
+      session.pendingComposition = {
+        genreSlug: pc.genreSlug,
+        id: pc.id,
+      };
     }
     return session;
   } catch {

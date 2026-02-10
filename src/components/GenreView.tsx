@@ -1,28 +1,33 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { Composition } from '@prisma/client';
 import { useChat } from '@/lib/chat-context';
 import { ChatPanel } from '@/components/Chatbot';
+import { getSession, updateSession } from '@/lib/session-storage';
 
 type GenreViewProps = {
   compositions: Pick<Composition, 'id' | 'title' | 'content'>[];
   displayGenre: string;
+  genreSlug: string;
 };
 
-export default function GenreView({ compositions, displayGenre }: GenreViewProps) {
-  const searchParams = useSearchParams();
+export default function GenreView({ compositions, displayGenre, genreSlug }: GenreViewProps) {
   const { setCurrentContext } = useChat();
   const [selectedCompositionId, setSelectedCompositionId] = useState<string | null>(null);
 
-  // Open with a composition pre-selected when linked from home page (e.g. ?composition=id).
+  // Open with a composition pre-selected when linked from home page.
   useEffect(() => {
-    const id = searchParams.get('composition');
-    if (id && compositions.some((c) => c.id === id)) {
-      setSelectedCompositionId(id);
+    const session = getSession();
+    const pending = session.pendingComposition;
+    if (pending && pending.genreSlug === genreSlug) {
+      if (compositions.some((c) => c.id === pending.id)) {
+        setSelectedCompositionId(pending.id);
+      }
+      // Clear the pending selection once it's been applied (or skipped).
+      updateSession({ pendingComposition: undefined });
     }
-  }, [searchParams, compositions]);
+  }, [genreSlug, compositions]);
 
   const selectedComposition = compositions.find((c) => c.id === selectedCompositionId);
 

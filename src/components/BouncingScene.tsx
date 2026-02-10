@@ -2,11 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { getSession, updateSession } from "@/lib/session-storage";
 import type { BouncingBlockAssignment } from "@/lib/session-storage";
 
+const CRAB_SIZE = 96;
+const CRAB_RADIUS = CRAB_SIZE / 2;
 const BALL_RADII = [150, 95, 102, 76, 88, 140, 70, 90];
-const BASE_SPEED = 2;
+const BASE_SPEED = 1.5;
 const EDGE_PADDING = 5;
 
 function shuffle<T>(arr: T[]): T[] {
@@ -22,12 +25,12 @@ type Bounds = { minX: number; maxX: number; minY: number; maxY: number };
 
 type Entity = {
   id: string;
-  type: "ball";
+  type: "ball" | "crab";
   x: number;
   y: number;
   vx: number;
   vy: number;
-  radius: number; // half side length of the square
+  radius: number; // half side length of the square or crab's collision radius
 };
 
 /** Box bounds (entity center + half-size). */
@@ -105,7 +108,7 @@ function resolveElasticAABB(
 export default function BouncingScene() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
-  const [entityDefs, setEntityDefs] = useState<{ id: string; type: "ball"; radius: number }[]>([]);
+  const [entityDefs, setEntityDefs] = useState<{ id: string; radius: number }[]>([]);
   const [blockAssignments, setBlockAssignments] = useState<BouncingBlockAssignment[] | null>(null);
   const entitiesRef = useRef<Entity[]>([]);
   const animationRef = useRef<number | null>(null);
@@ -137,6 +140,20 @@ export default function BouncingScene() {
 
     const entities: Entity[] = [];
 
+    // Center-spawn spinning crab
+    const centerX = (bounds.minX + bounds.maxX) / 2;
+    const centerY = (bounds.minY + bounds.maxY) / 2;
+    entities.push({
+      id: "crab",
+      type: "crab",
+      x: centerX,
+      y: centerY,
+      vx: BASE_SPEED * (Math.random() * 2 - 1),
+      vy: BASE_SPEED * (Math.random() * 2 - 1),
+      radius: CRAB_RADIUS,
+    });
+
+    // Spawn square blocks without overlapping crab or each other
     for (let i = 0; i < BALL_RADII.length; i++) {
       const r = BALL_RADII[i];
       let x: number, y: number;
@@ -166,7 +183,11 @@ export default function BouncingScene() {
     }
 
     entitiesRef.current = entities;
-    setEntityDefs(entities.map((e) => ({ id: e.id, type: e.type, radius: e.radius })));
+    setEntityDefs(
+      entities
+        .filter((e) => e.type === "ball")
+        .map((e) => ({ id: e.id, radius: e.radius }))
+    );
   }, [getBounds]);
 
   useEffect(() => {
@@ -209,60 +230,60 @@ export default function BouncingScene() {
     const startAnimation = () => {
       initEntities();
       const animate = () => {
-      const bounds = getBounds();
-      if (!bounds) return;
+        const bounds = getBounds();
+        if (!bounds) return;
 
-      const entities = entitiesRef.current;
-      const dt = 1;
+        const entities = entitiesRef.current;
+        const dt = 1;
 
-      for (const e of entities) {
-        e.x += e.vx * dt;
-        e.y += e.vy * dt;
+        for (const e of entities) {
+          e.x += e.vx * dt;
+          e.y += e.vy * dt;
 
-        if (e.x - e.radius <= bounds.minX) {
-          e.x = bounds.minX + e.radius;
-          e.vx = Math.abs(e.vx);
-        } else if (e.x + e.radius >= bounds.maxX) {
-          e.x = bounds.maxX - e.radius;
-          e.vx = -Math.abs(e.vx);
-        }
-        if (e.y - e.radius <= bounds.minY) {
-          e.y = bounds.minY + e.radius;
-          e.vy = Math.abs(e.vy);
-        } else if (e.y + e.radius >= bounds.maxY) {
-          e.y = bounds.maxY - e.radius;
-          e.vy = -Math.abs(e.vy);
-        }
-      }
-
-      for (let i = 0; i < entities.length; i++) {
-        for (let j = i + 1; j < entities.length; j++) {
-          const e1 = entities[i];
-          const e2 = entities[j];
-          const b1 = getBoxBounds(e1);
-          const b2 = getBoxBounds(e2);
-          const { overlapX, overlapY } = aabbOverlap(b1, b2);
-          if (overlapX > 0 && overlapY > 0) {
-            separateAABB(e1, e2, overlapX, overlapY);
-            const axis: "x" | "y" = overlapX < overlapY ? "x" : "y";
-            resolveElasticAABB(e1, e2, axis);
+          if (e.x - e.radius <= bounds.minX) {
+            e.x = bounds.minX + e.radius;
+            e.vx = Math.abs(e.vx);
+          } else if (e.x + e.radius >= bounds.maxX) {
+            e.x = bounds.maxX - e.radius;
+            e.vx = -Math.abs(e.vx);
+          }
+          if (e.y - e.radius <= bounds.minY) {
+            e.y = bounds.minY + e.radius;
+            e.vy = Math.abs(e.vy);
+          } else if (e.y + e.radius >= bounds.maxY) {
+            e.y = bounds.maxY - e.radius;
+            e.vy = -Math.abs(e.vy);
           }
         }
-      }
 
-      for (const e of entities) {
-        container.style.setProperty(
-          `--${e.id}-x`,
-          `${e.x - e.radius}px`
-        );
-        container.style.setProperty(
-          `--${e.id}-y`,
-          `${e.y - e.radius}px`
-        );
-      }
+        for (let i = 0; i < entities.length; i++) {
+          for (let j = i + 1; j < entities.length; j++) {
+            const e1 = entities[i];
+            const e2 = entities[j];
+            const b1 = getBoxBounds(e1);
+            const b2 = getBoxBounds(e2);
+            const { overlapX, overlapY } = aabbOverlap(b1, b2);
+            if (overlapX > 0 && overlapY > 0) {
+              separateAABB(e1, e2, overlapX, overlapY);
+              const axis: "x" | "y" = overlapX < overlapY ? "x" : "y";
+              resolveElasticAABB(e1, e2, axis);
+            }
+          }
+        }
 
-      animationRef.current = requestAnimationFrame(animate);
-    };
+        for (const e of entities) {
+          container.style.setProperty(
+            `--${e.id}-x`,
+            `${e.x - e.radius}px`
+          );
+          container.style.setProperty(
+            `--${e.id}-y`,
+            `${e.y - e.radius}px`
+          );
+        }
+
+        animationRef.current = requestAnimationFrame(animate);
+      };
 
       animationRef.current = requestAnimationFrame(animate);
     };
@@ -272,6 +293,35 @@ export default function BouncingScene() {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
   }, [mounted, getBounds, initEntities]);
+
+  const handleCrabClick = useCallback(() => {
+    const crab = entitiesRef.current.find((e) => e.type === "crab");
+    if (!crab) return;
+    const bounds = getBounds();
+    if (!bounds) return;
+    const others = entitiesRef.current.filter((e) => e.id !== crab.id);
+    const r = crab.radius;
+    for (let attempt = 0; attempt < 100; attempt++) {
+      const x =
+        bounds.minX + r + Math.random() * (bounds.maxX - bounds.minX - 2 * r);
+      const y =
+        bounds.minY + r + Math.random() * (bounds.maxY - bounds.minY - 2 * r);
+      let ok = true;
+      for (const other of others) {
+        if (boxesOverlap(x, y, r, other.x, other.y, other.radius)) {
+          ok = false;
+          break;
+        }
+      }
+      if (ok) {
+        crab.x = x;
+        crab.y = y;
+        break;
+      }
+    }
+  }, [getBounds, boxesOverlap]);
+
+  const crabEntity = entitiesRef.current.find((e) => e.type === "crab");
 
   return (
     <div
@@ -286,7 +336,7 @@ export default function BouncingScene() {
         const fontSizePx = Math.max(8, Math.min(Math.round(side * 0.15), 20));
         const href =
           assignment?.id && assignment?.genreSlug
-            ? `/${assignment.genreSlug}?composition=${encodeURIComponent(assignment.id)}`
+            ? `/${assignment.genreSlug}`
             : null;
         const blockStyle = {
           left: `var(--${def.id}-x, 0)` as const,
@@ -312,6 +362,16 @@ export default function BouncingScene() {
             href={href}
             className="absolute rounded-xl cursor-pointer flex items-center justify-center overflow-hidden px-1 no-underline"
             style={blockStyle}
+            onClick={() => {
+              if (assignment?.id && assignment?.genreSlug) {
+                updateSession({
+                  pendingComposition: {
+                    genreSlug: assignment.genreSlug,
+                    id: assignment.id,
+                  },
+                });
+              }
+            }}
           >
             {content}
           </Link>
@@ -325,6 +385,30 @@ export default function BouncingScene() {
           </div>
         );
       })}
+
+      {crabEntity && (
+        <button
+          type="button"
+          className="absolute rounded-full overflow-hidden"
+          style={{
+            left: `var(--${crabEntity.id}-x, 0)`,
+            top: `var(--${crabEntity.id}-y, 0)`,
+            width: crabEntity.radius * 2,
+            height: crabEntity.radius * 2,
+            border: "2px solid var(--text-borders)",
+          }}
+          onClick={handleCrabClick}
+        >
+          <Image
+            src="/images/cartoon-crab.png"
+            alt="Terrence the crab"
+            width={crabEntity.radius * 2}
+            height={crabEntity.radius * 2}
+            className="w-full h-full object-contain crab-spin pointer-events-none"
+            draggable={false}
+          />
+        </button>
+      )}
     </div>
   );
 }
