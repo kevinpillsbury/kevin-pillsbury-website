@@ -298,7 +298,7 @@ export default function BouncingScene() {
         return def.type === "ball" ? (
           <div
             key={def.id}
-            className="absolute rounded-full cursor-pointer"
+            className="absolute rounded-xl cursor-pointer"
             style={{
               left: `var(--${def.id}-x, 0)`,
               top: `var(--${def.id}-y, 0)`,
