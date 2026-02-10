@@ -5,7 +5,11 @@ import Image from "next/image";
 
 const CRAB_SIZE = 125;
 const CRAB_RADIUS = CRAB_SIZE / 2;
-const BALL_RADII = [30, 28, 24, 22, 20, 18, 15, 26, 25, 23, 21, 19, 17, 14]; // 14 balls
+const BALL_RADII = [
+  30, 28, 24, 22, 20, 18, 15, 26, 25, 23, 21, 19, 17, 14,
+  30, 28, 24, 22, 20, 18, 15, 26, 25, 23, 21, 19, 17, 14,
+  30, 28, 24, 22, 20, 18, 15, 26, 25, 23, 21, 19, 17, 14,
+]; // 42 balls (3x)
 const BASE_SPEED = 2;
 const TELEPORT_FADE_MS = 800;
 const EDGE_PADDING = 5;
@@ -288,42 +292,6 @@ export default function BouncingScene() {
       className="absolute inset-0 overflow-hidden"
       style={{ backgroundColor: "var(--bubbles)" } as React.CSSProperties}
     >
-      {/* Corner decorative lines - bottom-left and bottom-right */}
-      <svg
-        className="absolute bottom-0 left-0 w-48 h-32 pointer-events-none"
-        viewBox="0 0 80 60"
-        preserveAspectRatio="none"
-      >
-        {[0, 1, 2].map((i) => (
-          <line
-            key={i}
-            x1="0"
-            y1="60"
-            x2={20 + i * 15}
-            y2={10 - i * 5}
-            stroke="var(--background)"
-            strokeWidth="2"
-          />
-        ))}
-      </svg>
-      <svg
-        className="absolute bottom-0 right-0 w-48 h-32 pointer-events-none"
-        viewBox="0 0 80 60"
-        preserveAspectRatio="none"
-      >
-        {[0, 1, 2].map((i) => (
-          <line
-            key={i}
-            x1="80"
-            y1="60"
-            x2={60 - i * 15}
-            y2={10 - i * 5}
-            stroke="var(--background)"
-            strokeWidth="2"
-          />
-        ))}
-      </svg>
-
       {/* Entities */}
       {entityDefs.map((def) => {
         const full = entitiesRef.current.find((x) => x.id === def.id);
