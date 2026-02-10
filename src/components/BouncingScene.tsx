@@ -6,10 +6,9 @@ import Image from "next/image";
 const CRAB_SIZE = 125;
 const CRAB_RADIUS = CRAB_SIZE / 2;
 const BALL_RADII = [
-  30, 28, 24, 22, 20, 18, 15, 26, 25, 23, 21, 19, 17, 14,
-  30, 28, 24, 22, 20, 18, 15, 26, 25, 23, 21, 19, 17, 14,
-  30, 28, 24, 22, 20, 18, 15, 26, 25, 23, 21, 19, 17, 14,
-]; // 42 balls (3x)
+  14, 16, 18, 20, 23, 26, 29, 32, 35, 38, 40, 42, 45,
+  16, 22, 28, 34, 40, 18, 25, 32, 38, 21,
+]; // 21 balls, radii 14–45
 const BASE_SPEED = 2;
 const TELEPORT_FADE_MS = 800;
 const EDGE_PADDING = 5;
@@ -306,6 +305,7 @@ export default function BouncingScene() {
               width: def.radius * 2,
               height: def.radius * 2,
               backgroundColor: "var(--background)",
+              border: "2px solid var(--text-borders)",
               opacity: `var(--${def.id}-opacity, 1)`,
               transition: "none",
             }}
