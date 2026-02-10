@@ -61,7 +61,6 @@ function separateOverlap(
   if (dist === 0) return;
   const nx = dx / dist;
   const ny = dy / dist;
-  const totalRadius = e1.radius + e2.radius;
   const m1 = Math.PI * e1.radius * e1.radius;
   const m2 = Math.PI * e2.radius * e2.radius;
   const totalM = m1 + m2;
@@ -186,16 +185,18 @@ export default function BouncingScene() {
   );
 
   useEffect(() => {
-    setMounted(true);
+    const id = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(id);
   }, []);
 
   useEffect(() => {
     if (!mounted || !containerRef.current) return;
 
-    initEntities();
     const container = containerRef.current;
 
-    const animate = () => {
+    const startAnimation = () => {
+      initEntities();
+      const animate = () => {
       const bounds = getBounds();
       if (!bounds) return;
 
@@ -259,7 +260,10 @@ export default function BouncingScene() {
       animationRef.current = requestAnimationFrame(animate);
     };
 
-    animationRef.current = requestAnimationFrame(animate);
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(startAnimation);
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
