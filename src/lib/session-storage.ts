@@ -6,9 +6,16 @@
 const SESSION_KEY = "kpw_session_v1";
 const LEGACY_CHAT_KEY = "kpw_chat_messages_v1";
 
+export type BouncingBlockAssignment = {
+  id: string;
+  title: string;
+  genreSlug: string;
+};
+
 export type Session = {
   chatMessages?: Array<{ role: string; content: string }>;
   bouncingBlockTitles?: string[];
+  bouncingBlockAssignments?: BouncingBlockAssignment[];
 };
 
 function parseSession(raw: string | null): Session {
@@ -30,6 +37,16 @@ function parseSession(raw: string | null): Session {
     if (Array.isArray(obj.bouncingBlockTitles)) {
       session.bouncingBlockTitles = obj.bouncingBlockTitles.filter(
         (t): t is string => typeof t === "string"
+      );
+    }
+    if (Array.isArray(obj.bouncingBlockAssignments)) {
+      session.bouncingBlockAssignments = obj.bouncingBlockAssignments.filter(
+        (a): a is BouncingBlockAssignment =>
+          a != null &&
+          typeof a === "object" &&
+          typeof (a as BouncingBlockAssignment).id === "string" &&
+          typeof (a as BouncingBlockAssignment).title === "string" &&
+          typeof (a as BouncingBlockAssignment).genreSlug === "string"
       );
     }
     return session;

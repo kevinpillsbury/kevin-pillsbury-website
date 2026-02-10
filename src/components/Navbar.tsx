@@ -10,7 +10,7 @@ const Navbar = () => {
   const router = useRouter();
   const { themes, activeTheme, setActiveThemeByName } = useTheme();
   return (
-    <nav className="sticky top-0 z-[100] bg-[var(--background)] border-b border-[var(--text-borders)]">
+    <nav className="sticky top-0 z-[100] bg-[var(--bubbles)] border-b border-[var(--text-borders)]">
       <div className="w-full pl-2 pr-6 sm:pl-2 sm:pr-8 lg:pl-2 lg:pr-10">
         <div className="flex items-center justify-start h-16">
           <div className="flex w-full items-center justify-between">

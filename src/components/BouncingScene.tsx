@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { getSession, updateSession } from "@/lib/session-storage";
+import type { BouncingBlockAssignment } from "@/lib/session-storage";
 
 const BALL_RADII = [150, 95, 102, 76, 88, 140, 70, 90];
 const BASE_SPEED = 2;
-const TELEPORT_FADE_MS = 600;
 const EDGE_PADDING = 5;
 
 function shuffle<T>(arr: T[]): T[] {
@@ -27,8 +28,6 @@ type Entity = {
   vx: number;
   vy: number;
   radius: number; // half side length of the square
-  fadingOut: boolean;
-  opacity: number;
 };
 
 /** Box bounds (entity center + half-size). */
@@ -107,7 +106,7 @@ export default function BouncingScene() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const [entityDefs, setEntityDefs] = useState<{ id: string; type: "ball"; radius: number }[]>([]);
-  const [blockTitles, setBlockTitles] = useState<string[] | null>(null);
+  const [blockAssignments, setBlockAssignments] = useState<BouncingBlockAssignment[] | null>(null);
   const entitiesRef = useRef<Entity[]>([]);
   const animationRef = useRef<number | null>(null);
 
@@ -130,36 +129,6 @@ export default function BouncingScene() {
       );
     },
     []
-  );
-
-  const getRandomUnoccupiedPosition = useCallback(
-    (radius: number, excludeId: string): { x: number; y: number } | null => {
-      const bounds = getBounds();
-      if (!bounds) return null;
-      const others = entitiesRef.current.filter((e) => e.id !== excludeId);
-      const padding = 15;
-      for (let attempt = 0; attempt < 100; attempt++) {
-        const x =
-          bounds.minX +
-          radius +
-          Math.random() * (bounds.maxX - bounds.minX - 2 * radius);
-        const y =
-          bounds.minY +
-          radius +
-          Math.random() * (bounds.maxY - bounds.minY - 2 * radius);
-        let ok = true;
-        for (const e of others) {
-          if (e.fadingOut) continue;
-          if (boxesOverlap(x, y, radius + padding, e.x, e.y, e.radius)) {
-            ok = false;
-            break;
-          }
-        }
-        if (ok) return { x, y };
-      }
-      return null;
-    },
-    [getBounds, boxesOverlap]
   );
 
   const initEntities = useCallback(() => {
@@ -193,8 +162,6 @@ export default function BouncingScene() {
         vx: BASE_SPEED * (Math.random() * 2 - 1),
         vy: BASE_SPEED * (Math.random() * 2 - 1),
         radius: r,
-        fadingOut: false,
-        opacity: 1,
       });
     }
 
@@ -202,59 +169,36 @@ export default function BouncingScene() {
     setEntityDefs(entities.map((e) => ({ id: e.id, type: e.type, radius: e.radius })));
   }, [getBounds]);
 
-  const [, forceUpdate] = useState(0);
-  const handleEntityClick = useCallback(
-    (id: string) => {
-      const entity = entitiesRef.current.find((e) => e.id === id);
-      if (!entity || entity.fadingOut) return;
-
-      entity.fadingOut = true;
-      forceUpdate((n) => n + 1);
-
-      const newPos = getRandomUnoccupiedPosition(entity.radius, id);
-      if (!newPos) {
-        entity.fadingOut = false;
-        return;
-      }
-
-      setTimeout(() => {
-        entity.x = newPos.x;
-        entity.y = newPos.y;
-        entity.fadingOut = false;
-        entity.opacity = 1;
-      }, TELEPORT_FADE_MS);
-    },
-    [getRandomUnoccupiedPosition]
-  );
-
   useEffect(() => {
     const id = requestAnimationFrame(() => setMounted(true));
     return () => cancelAnimationFrame(id);
   }, []);
 
-  // Load or assign titles per block; persist in shared session so it survives navigation but resets on tab close.
+  // Load or assign composition links per block; persist in shared session so it survives navigation but resets on tab close.
   useEffect(() => {
     if (!mounted || typeof window === "undefined") return;
     const N = BALL_RADII.length;
     const session = getSession();
-    const stored = session.bouncingBlockTitles;
+    const stored = session.bouncingBlockAssignments;
     if (Array.isArray(stored) && stored.length === N) {
-      setBlockTitles(stored);
+      setBlockAssignments(stored);
       return;
     }
     fetch("/api/compositions/titles")
-      .then((res) => (res.ok ? res.json() : Promise.resolve({ titles: [] as string[] })))
-      .then((data: { titles: string[] }) => {
-        const all = data.titles ?? [];
+      .then((res) =>
+        res.ok ? res.json() : Promise.resolve({ compositions: [] as BouncingBlockAssignment[] })
+      )
+      .then((data: { compositions: BouncingBlockAssignment[] }) => {
+        const all = data.compositions ?? [];
         const shuffled = shuffle(all);
-        const assigned: string[] = [];
+        const assigned: BouncingBlockAssignment[] = [];
         for (let i = 0; i < N; i++) {
-          assigned.push(shuffled[i] ?? "");
+          assigned.push(shuffled[i] ?? { id: "", title: "", genreSlug: "" });
         }
-        updateSession({ bouncingBlockTitles: assigned });
-        setBlockTitles(assigned);
+        updateSession({ bouncingBlockAssignments: assigned });
+        setBlockAssignments(assigned);
       })
-      .catch(() => setBlockTitles(Array(N).fill("")));
+      .catch(() => setBlockAssignments(Array(N).fill({ id: "", title: "", genreSlug: "" })));
   }, [mounted]);
 
   useEffect(() => {
@@ -272,9 +216,6 @@ export default function BouncingScene() {
       const dt = 1;
 
       for (const e of entities) {
-        if (e.fadingOut) {
-          e.opacity = Math.max(0, e.opacity - (1 / TELEPORT_FADE_MS) * (1000 / 60));
-        }
         e.x += e.vx * dt;
         e.y += e.vy * dt;
 
@@ -298,7 +239,6 @@ export default function BouncingScene() {
         for (let j = i + 1; j < entities.length; j++) {
           const e1 = entities[i];
           const e2 = entities[j];
-          if (e1.fadingOut || e2.fadingOut) continue;
           const b1 = getBoxBounds(e1);
           const b2 = getBoxBounds(e2);
           const { overlapX, overlapY } = aabbOverlap(b1, b2);
@@ -319,7 +259,6 @@ export default function BouncingScene() {
           `--${e.id}-y`,
           `${e.y - e.radius}px`
         );
-        container.style.setProperty(`--${e.id}-opacity`, String(e.opacity));
       }
 
       animationRef.current = requestAnimationFrame(animate);
@@ -338,45 +277,51 @@ export default function BouncingScene() {
     <div
       ref={containerRef}
       className="absolute inset-0 overflow-hidden"
-      style={{ backgroundColor: "var(--bubbles)" } as React.CSSProperties}
+      style={{ backgroundColor: "var(--background)" } as React.CSSProperties}
     >
       {/* Entities */}
       {entityDefs.map((def, index) => {
-        const title = blockTitles?.[index] ?? "";
+        const assignment = blockAssignments?.[index];
         const side = def.radius * 2;
-        const fontSizePx = Math.max(10, Math.min(Math.round(side * 0.2), 28));
-        return (
+        const fontSizePx = Math.max(8, Math.min(Math.round(side * 0.15), 20));
+        const href =
+          assignment?.id && assignment?.genreSlug
+            ? `/${assignment.genreSlug}?composition=${encodeURIComponent(assignment.id)}`
+            : null;
+        const blockStyle = {
+          left: `var(--${def.id}-x, 0)` as const,
+          top: `var(--${def.id}-y, 0)` as const,
+          width: side,
+          height: side,
+          backgroundColor: "var(--bubbles)",
+          border: "2px solid var(--text-borders)",
+          transition: "none" as const,
+          color: "var(--text-borders)",
+        };
+        const content = assignment?.title ? (
+          <span
+            className="text-center line-clamp-3 leading-tight"
+            style={{ fontSize: fontSizePx, color: "var(--text-borders)" }}
+          >
+            {assignment.title}
+          </span>
+        ) : null;
+        return href ? (
+          <Link
+            key={def.id}
+            href={href}
+            className="absolute rounded-xl cursor-pointer flex items-center justify-center overflow-hidden px-1 no-underline"
+            style={blockStyle}
+          >
+            {content}
+          </Link>
+        ) : (
           <div
             key={def.id}
-            className="absolute rounded-xl cursor-pointer flex items-center justify-center overflow-hidden px-1"
-            style={{
-              left: `var(--${def.id}-x, 0)`,
-              top: `var(--${def.id}-y, 0)`,
-              width: side,
-              height: side,
-              backgroundColor: "var(--background)",
-              border: "2px solid var(--text-borders)",
-              opacity: `var(--${def.id}-opacity, 1)`,
-              transition: "none",
-            }}
-            onClick={() => handleEntityClick(def.id)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(ev) => {
-              if (ev.key === "Enter" || ev.key === " ") handleEntityClick(def.id);
-            }}
+            className="absolute rounded-xl flex items-center justify-center overflow-hidden px-1"
+            style={blockStyle}
           >
-            {title && (
-              <span
-                className="text-center line-clamp-3 leading-tight"
-                style={{
-                  fontSize: fontSizePx,
-                  color: "var(--text-borders)",
-                }}
-              >
-                {title}
-              </span>
-            )}
+            {content}
           </div>
         );
       })}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Composition } from '@prisma/client';
 import { useChat } from '@/lib/chat-context';
 import { ChatPanel } from '@/components/Chatbot';
@@ -11,8 +12,17 @@ type GenreViewProps = {
 };
 
 export default function GenreView({ compositions, displayGenre }: GenreViewProps) {
+  const searchParams = useSearchParams();
   const { setCurrentContext } = useChat();
   const [selectedCompositionId, setSelectedCompositionId] = useState<string | null>(null);
+
+  // Open with a composition pre-selected when linked from home page (e.g. ?composition=id).
+  useEffect(() => {
+    const id = searchParams.get('composition');
+    if (id && compositions.some((c) => c.id === id)) {
+      setSelectedCompositionId(id);
+    }
+  }, [searchParams, compositions]);
 
   const selectedComposition = compositions.find((c) => c.id === selectedCompositionId);
 

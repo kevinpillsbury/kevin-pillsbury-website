@@ -4,12 +4,10 @@ import DisableScroll from "@/components/DisableScroll";
 export default function Home() {
   return (
     <DisableScroll>
-    <div className="relative h-[calc(100vh-8rem)] overflow-hidden">
-      {/* Bouncing balls and crab - background uses bubbles color from theme */}
+    <div className="relative h-[calc(100vh-8rem)] overflow-hidden bg-[var(--background)]">
       <div className="fixed top-16 inset-x-0 bottom-0 z-10 overflow-hidden">
         <BouncingScene />
       </div>
-      {/* Content overlay - in front of crab */}
       <div className="relative z-20 flex flex-col items-center justify-center text-center min-h-[calc(100vh-8rem)] -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 pointer-events-none">
         <div className="max-w-2xl">
           <h1 className="text-3xl font-bold tracking-tight text-[var(--text-borders)] sm:text-5xl font-serif">
@@ -17,10 +15,6 @@ export default function Home() {
           </h1>
         </div>
       </div>
-      {/* Teleport hint at bottom */}
-      <p className="fixed bottom-4 left-0 right-0 z-20 text-center text-sm text-[var(--text-borders)]/70 pointer-events-none">
-        Teleport objects with a tap.
-      </p>
     </div>
     </DisableScroll>
   );
