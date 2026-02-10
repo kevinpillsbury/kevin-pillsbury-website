@@ -15,16 +15,3 @@ body {
   color: var(--text-borders);
   font-family: Arial, Helvetica, sans-serif;
 }
-
-@keyframes spin-counter-clockwise {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(-360deg);
-  }
-}
-
-.animate-spin-counter-clockwise {
-  animation: spin-counter-clockwise 15s linear infinite;
-}

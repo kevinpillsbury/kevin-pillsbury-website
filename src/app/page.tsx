@@ -15,11 +15,12 @@ export default function Home() {
           <h1 className="text-3xl font-bold tracking-tight text-[var(--text-borders)] sm:text-5xl font-serif">
             Kevin Pillsbury
           </h1>
-          <p className="mt-2 text-sm text-[var(--text-borders)]/80">
-            (Terrence likes to teleport)
-          </p>
         </div>
       </div>
+      {/* Teleport hint at bottom */}
+      <p className="fixed bottom-4 left-0 right-0 z-20 text-center text-sm text-[var(--text-borders)]/70 pointer-events-none">
+        Teleport objects with a tap.
+      </p>
     </div>
     </DisableScroll>
   );

@@ -13,20 +13,6 @@ const config: Config = {
         sans: ['var(--font-geist-sans)'],
         mono: ['var(--font-geist-mono)'],
       },
-      keyframes: {
-        'spin-slow': {
-          from: { transform: 'rotate(0deg)' },
-          to: { transform: 'rotate(360deg)' },
-        },
-        'spin-counter-clockwise': {
-          from: { transform: 'rotate(0deg)' },
-          to: { transform: 'rotate(-360deg)' },
-        },
-      },
-      animation: {
-        'spin-slow': 'spin-slow 8s linear infinite',
-        'spin-counter-clockwise': 'spin-counter-clockwise 8s linear infinite',
-      },
     },
   },
   plugins: [
