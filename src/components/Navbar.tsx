@@ -2,10 +2,12 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useTheme } from "../lib/theme-context";
 
 const Navbar = () => {
+  const router = useRouter();
   const { themes, activeTheme, setActiveThemeByName } = useTheme();
   return (
     <nav className="sticky top-0 z-[100] bg-[var(--background)] border-b border-[var(--text-borders)]">
@@ -27,7 +29,7 @@ const Navbar = () => {
                 </DropdownMenu.Trigger>
                   <DropdownMenu.Portal>
                     <DropdownMenu.Content
-                      className="mt-2 w-64 min-w-[16rem] bg-[var(--background)] rounded-md shadow-lg ring-1 ring-[var(--text-borders)] border border-[var(--text-borders)] focus:outline-none py-2"
+                      className="mt-2 w-64 min-w-[16rem] bg-[var(--background)] rounded-md shadow-lg ring-1 ring-[var(--text-borders)] border border-[var(--text-borders)] focus:outline-none py-2 z-[110]"
                       sideOffset={5}
                     >
                       <DropdownMenu.Item asChild>
@@ -68,6 +70,10 @@ const Navbar = () => {
               <Link
                 href="/rate-your-synopsis"
                 className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
+                onClick={(e) => {
+                  e.preventDefault();
+                  router.push("/rate-your-synopsis");
+                }}
               >
                 Rate your synopsis (Beta)
               </Link>

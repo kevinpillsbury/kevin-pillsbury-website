@@ -1,11 +1,21 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { getSession, updateSession } from "@/lib/session-storage";
 
-const BALL_RADII = [49, 95, 55, 56, 60, 76, 88, 140, 50, 70, 90];
+const BALL_RADII = [150, 95, 102, 76, 88, 140, 70, 90];
 const BASE_SPEED = 2;
 const TELEPORT_FADE_MS = 600;
 const EDGE_PADDING = 5;
+
+function shuffle<T>(arr: T[]): T[] {
+  const out = [...arr];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
 
 type Bounds = { minX: number; maxX: number; minY: number; maxY: number };
 
@@ -97,6 +107,7 @@ export default function BouncingScene() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const [entityDefs, setEntityDefs] = useState<{ id: string; type: "ball"; radius: number }[]>([]);
+  const [blockTitles, setBlockTitles] = useState<string[] | null>(null);
   const entitiesRef = useRef<Entity[]>([]);
   const animationRef = useRef<number | null>(null);
 
@@ -221,6 +232,31 @@ export default function BouncingScene() {
     return () => cancelAnimationFrame(id);
   }, []);
 
+  // Load or assign titles per block; persist in shared session so it survives navigation but resets on tab close.
+  useEffect(() => {
+    if (!mounted || typeof window === "undefined") return;
+    const N = BALL_RADII.length;
+    const session = getSession();
+    const stored = session.bouncingBlockTitles;
+    if (Array.isArray(stored) && stored.length === N) {
+      setBlockTitles(stored);
+      return;
+    }
+    fetch("/api/compositions/titles")
+      .then((res) => (res.ok ? res.json() : Promise.resolve({ titles: [] as string[] })))
+      .then((data: { titles: string[] }) => {
+        const all = data.titles ?? [];
+        const shuffled = shuffle(all);
+        const assigned: string[] = [];
+        for (let i = 0; i < N; i++) {
+          assigned.push(shuffled[i] ?? "");
+        }
+        updateSession({ bouncingBlockTitles: assigned });
+        setBlockTitles(assigned);
+      })
+      .catch(() => setBlockTitles(Array(N).fill("")));
+  }, [mounted]);
+
   useEffect(() => {
     if (!mounted || !containerRef.current) return;
 
@@ -305,15 +341,19 @@ export default function BouncingScene() {
       style={{ backgroundColor: "var(--bubbles)" } as React.CSSProperties}
     >
       {/* Entities */}
-      {entityDefs.map((def) => (
+      {entityDefs.map((def, index) => {
+        const title = blockTitles?.[index] ?? "";
+        const side = def.radius * 2;
+        const fontSizePx = Math.max(10, Math.min(Math.round(side * 0.2), 28));
+        return (
           <div
             key={def.id}
-            className="absolute rounded-xl cursor-pointer"
+            className="absolute rounded-xl cursor-pointer flex items-center justify-center overflow-hidden px-1"
             style={{
               left: `var(--${def.id}-x, 0)`,
               top: `var(--${def.id}-y, 0)`,
-              width: def.radius * 2,
-              height: def.radius * 2,
+              width: side,
+              height: side,
               backgroundColor: "var(--background)",
               border: "2px solid var(--text-borders)",
               opacity: `var(--${def.id}-opacity, 1)`,
@@ -325,8 +365,21 @@ export default function BouncingScene() {
             onKeyDown={(ev) => {
               if (ev.key === "Enter" || ev.key === " ") handleEntityClick(def.id);
             }}
-          />
-      ))}
+          >
+            {title && (
+              <span
+                className="text-center line-clamp-3 leading-tight"
+                style={{
+                  fontSize: fontSizePx,
+                  color: "var(--text-borders)",
+                }}
+              >
+                {title}
+              </span>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

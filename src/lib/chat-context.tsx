@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { getSession, updateSession } from './session-storage';
 
 export type ChatMessage = { role: 'user' | 'assistant'; content: string };
 
@@ -32,8 +33,6 @@ type ChatContextValue = {
 };
 
 const ChatContext = createContext<ChatContextValue | null>(null);
-
-const CHAT_SESSION_STORAGE_KEY = 'kpw_chat_messages_v1';
 
 function parseStoredMessages(raw: string): ChatMessage[] | null {
   try {
@@ -105,9 +104,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Persist chat history for the lifetime of the current tab/session.
     try {
-      const raw = sessionStorage.getItem(CHAT_SESSION_STORAGE_KEY);
-      if (raw) {
-        const parsed = parseStoredMessages(raw);
+      const session = getSession();
+      if (session.chatMessages?.length) {
+        const parsed = parseStoredMessages(JSON.stringify(session.chatMessages));
         if (parsed) setMessages(parsed);
       }
     } catch {
@@ -120,11 +119,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isHistoryInitialized) return;
     try {
-      if (messages.length === 0) {
-        sessionStorage.removeItem(CHAT_SESSION_STORAGE_KEY);
-      } else {
-        sessionStorage.setItem(CHAT_SESSION_STORAGE_KEY, JSON.stringify(messages));
-      }
+      updateSession({ chatMessages: messages });
     } catch {
       // Ignore storage errors.
     }
