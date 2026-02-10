@@ -5,7 +5,7 @@ import Image from "next/image";
 
 const CRAB_SIZE = 125;
 const CRAB_RADIUS = CRAB_SIZE / 2;
-const BALL_RADII = [30, 28, 24, 22, 20, 18, 15]; // 7 balls, varying sizes
+const BALL_RADII = [30, 28, 24, 22, 20, 18, 15, 26, 25, 23, 21, 19, 17, 14]; // 14 balls
 const BASE_SPEED = 2;
 const TELEPORT_FADE_MS = 800;
 const EDGE_PADDING = 5;
@@ -40,15 +40,15 @@ function resolveElasticCollision(
   const ny = dy / dist;
   const m1 = Math.PI * e1.radius * e1.radius;
   const m2 = Math.PI * e2.radius * e2.radius;
-  const dvx = e1.vx - e2.vx;
-  const dvy = e1.vy - e2.vy;
-  const dvn = dvx * nx + dvy * ny;
-  if (dvn >= 0) return; // moving apart
-  const j = (2 * dvn) / (1 / m1 + 1 / m2);
-  e1.vx -= (j / m1) * nx;
-  e1.vy -= (j / m1) * ny;
-  e2.vx += (j / m2) * nx;
-  e2.vy += (j / m2) * ny;
+  const v1n = e1.vx * nx + e1.vy * ny;
+  const v2n = e2.vx * nx + e2.vy * ny;
+  if (v1n - v2n >= 0) return; // moving apart
+  const v1nNew = ((m1 - m2) * v1n + 2 * m2 * v2n) / (m1 + m2);
+  const v2nNew = ((m2 - m1) * v2n + 2 * m1 * v1n) / (m1 + m2);
+  e1.vx += (v1nNew - v1n) * nx;
+  e1.vy += (v1nNew - v1n) * ny;
+  e2.vx += (v2nNew - v2n) * nx;
+  e2.vy += (v2nNew - v2n) * ny;
 }
 
 function separateOverlap(

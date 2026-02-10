@@ -8,7 +8,7 @@ import { useTheme } from "../lib/theme-context";
 const Navbar = () => {
   const { themes, activeTheme, setActiveThemeByName } = useTheme();
   return (
-    <nav className="sticky top-0 z-50 bg-[var(--background)] border-b border-[var(--text-borders)]">
+    <nav className="sticky top-0 z-[100] bg-[var(--background)] border-b border-[var(--text-borders)]">
       <div className="w-full pl-2 pr-6 sm:pl-2 sm:pr-8 lg:pl-2 lg:pr-10">
         <div className="flex items-center justify-start h-16">
           <div className="flex w-full items-center justify-between">
@@ -80,21 +80,19 @@ const Navbar = () => {
               </DropdownMenu.Trigger>
               <DropdownMenu.Portal>
                 <DropdownMenu.Content
-                  className="mt-2 w-64 min-w-[16rem] bg-[var(--background)] rounded-md shadow-lg ring-1 ring-[var(--text-borders)] border border-[var(--text-borders)] focus:outline-none py-2"
+                  className="mt-2 w-64 min-w-[16rem] bg-[var(--background)] rounded-md shadow-lg ring-1 ring-[var(--text-borders)] border border-[var(--text-borders)] focus:outline-none py-2 z-[110]"
                   sideOffset={5}
                   align="end"
                 >
                   {themes.map((t) => (
-                    <DropdownMenu.Item key={t.name} asChild>
-                      <button
-                        type="button"
-                        onClick={() => setActiveThemeByName(t.name)}
-                        className={`block w-full text-left px-5 py-3 text-base text-[var(--text-borders)] hover:bg-[var(--bubbles)] ${
-                          t.name === activeTheme.name ? "opacity-100" : "opacity-80"
-                        }`}
-                      >
-                        {t.name}
-                      </button>
+                    <DropdownMenu.Item
+                      key={t.name}
+                      onSelect={() => setActiveThemeByName(t.name)}
+                      className={`block w-full text-left px-5 py-3 text-base text-[var(--text-borders)] hover:bg-[var(--bubbles)] cursor-pointer focus:outline-none focus:bg-[var(--bubbles)] ${
+                        t.name === activeTheme.name ? "opacity-100" : "opacity-80"
+                      }`}
+                    >
+                      {t.name}
                     </DropdownMenu.Item>
                   ))}
                 </DropdownMenu.Content>
