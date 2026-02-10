@@ -35,20 +35,22 @@ function resolveElasticCollision(
   dy: number,
   dist: number
 ) {
-  if (dist === 0) return;
-  const nx = dx / dist;
-  const ny = dy / dist;
+  if (dist <= 0) return;
+  const distSq = dist * dist;
   const m1 = Math.PI * e1.radius * e1.radius;
   const m2 = Math.PI * e2.radius * e2.radius;
-  const v1n = e1.vx * nx + e1.vy * ny;
-  const v2n = e2.vx * nx + e2.vy * ny;
-  if (v1n - v2n >= 0) return; // moving apart
-  const v1nNew = ((m1 - m2) * v1n + 2 * m2 * v2n) / (m1 + m2);
-  const v2nNew = ((m2 - m1) * v2n + 2 * m1 * v1n) / (m1 + m2);
-  e1.vx += (v1nNew - v1n) * nx;
-  e1.vy += (v1nNew - v1n) * ny;
-  e2.vx += (v2nNew - v2n) * nx;
-  e2.vy += (v2nNew - v2n) * ny;
+  // Wikipedia elastic collision: v' = v - (2m_other/(m1+m2)) * <v-v_other|center_diff> / |center_diff|^2 * center_diff
+  // dx,dy = x2-x1 (from e1 to e2). For v'1 we use (x1-x2) = (-dx,-dy)
+  const dvx = e1.vx - e2.vx;
+  const dvy = e1.vy - e2.vy;
+  const dot = (-dx) * dvx + (-dy) * dvy; // (x1-x2)·(v1-v2), negative when approaching
+  if (dot >= 0) return; // moving apart
+  const f1 = ((2 * m2) / (m1 + m2)) * (dot / distSq);
+  e1.vx += f1 * dx; // v1 - f1*(x1-x2) = v1 + f1*(dx,dy) since x1-x2=(-dx,-dy)
+  e1.vy += f1 * dy;
+  const f2 = ((2 * m1) / (m1 + m2)) * (dot / distSq); // same dot for v2
+  e2.vx -= f2 * dx; // v2 - f2*(x2-x1)
+  e2.vy -= f2 * dy;
 }
 
 function separateOverlap(
