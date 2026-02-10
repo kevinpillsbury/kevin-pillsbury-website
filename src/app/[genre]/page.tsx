@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import prisma from '../../lib/prisma';
 import GenreView from '../../components/GenreView';
 import { notFound } from 'next/navigation';
@@ -80,7 +81,9 @@ export default async function GenrePage({ params }: GenrePageProps) {
 
   return (
     <div className="w-full h-[calc(100vh-8rem)] overflow-hidden">
-      <GenreView compositions={compositions} displayGenre={genreInfo.display} />
+      <Suspense fallback={<div className="h-full min-h-0 animate-pulse bg-[var(--bubbles)]/30" />}>
+        <GenreView compositions={compositions} displayGenre={genreInfo.display} />
+      </Suspense>
     </div>
   );
 }
