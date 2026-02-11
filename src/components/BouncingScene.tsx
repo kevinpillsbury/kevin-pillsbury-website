@@ -8,7 +8,7 @@ import type { BouncingBlockAssignment } from "@/lib/session-storage";
 
 const CRAB_SIZE = 96;
 const CRAB_RADIUS = CRAB_SIZE / 2;
-const BALL_RADII = [150, 95, 102, 76, 88, 140, 70, 90];
+const BLOCK_SIZES = [150, 95, 102, 76, 88, 140, 70, 90];
 const BASE_SPEED = 1.5;
 const EDGE_PADDING = 5;
 
@@ -25,7 +25,7 @@ type Bounds = { minX: number; maxX: number; minY: number; maxY: number };
 
 type Entity = {
   id: string;
-  type: "ball" | "crab";
+  type: "block" | "crab";
   x: number;
   y: number;
   vx: number;
@@ -154,8 +154,8 @@ export default function BouncingScene() {
     });
 
     // Spawn square blocks without overlapping crab or each other
-    for (let i = 0; i < BALL_RADII.length; i++) {
-      const r = BALL_RADII[i];
+    for (let i = 0; i < BLOCK_SIZES.length; i++) {
+      const r = BLOCK_SIZES[i];
       let x: number, y: number;
       let ok = false;
       for (let t = 0; t < 50; t++) {
@@ -172,8 +172,8 @@ export default function BouncingScene() {
       }
       if (!ok) continue;
       entities.push({
-        id: `ball-${i}`,
-        type: "ball",
+        id: `block-${i}`,
+        type: "block",
         x: x!,
         y: y!,
         vx: BASE_SPEED * (Math.random() * 2 - 1),
@@ -185,7 +185,7 @@ export default function BouncingScene() {
     entitiesRef.current = entities;
     setEntityDefs(
       entities
-        .filter((e) => e.type === "ball")
+        .filter((e) => e.type === "block")
         .map((e) => ({ id: e.id, radius: e.radius }))
     );
   }, [getBounds]);
@@ -198,7 +198,7 @@ export default function BouncingScene() {
   // Load or assign composition links per block; persist in shared session so it survives navigation but resets on tab close.
   useEffect(() => {
     if (!mounted || typeof window === "undefined") return;
-    const N = BALL_RADII.length;
+    const N = BLOCK_SIZES.length;
     const session = getSession();
     const stored = session.bouncingBlockAssignments;
     if (Array.isArray(stored) && stored.length === N) {
