@@ -446,7 +446,9 @@ export default function BouncingScene() {
       {crabEntity && (
         <button
           type="button"
-          className={`absolute rounded-full overflow-hidden transition-opacity duration-1000`}
+          className={`absolute rounded-full overflow-hidden ${
+            isCrabFading ? "transition-opacity duration-1000" : ""
+          }`}
           style={{
             left: `var(--${crabEntity.id}-x, 0)`,
             top: `var(--${crabEntity.id}-y, 0)`,
