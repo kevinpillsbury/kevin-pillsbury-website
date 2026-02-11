@@ -1,6 +1,5 @@
 import BouncingScene from "@/components/BouncingScene";
 import DisableScroll from "@/components/DisableScroll";
-import EasterEggButton from "@/components/EasterEggButton";
 
 export default function Home() {
   return (
@@ -9,9 +8,6 @@ export default function Home() {
         <div className="fixed top-16 inset-x-0 bottom-0 z-10 overflow-hidden">
           <BouncingScene />
         </div>
-
-        {/* Invisible easter egg button in bottom-left, behind bouncing blocks */}
-        <EasterEggButton />
 
         <div className="relative z-20 flex flex-col items-center justify-center text-center min-h-[calc(100vh-8rem)] -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 pointer-events-none">
           <div className="max-w-2xl">
