@@ -107,7 +107,7 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
               <div className="h-full min-h-0 overflow-y-auto px-8 py-6 sm:px-10 sm:py-7">
                 {selectedComposition ? (
                   <>
-                    <h2 className="font-serif text-4xl text-center text-[var(--text-borders)] mb-4">
+                    <h2 className="font-serif text-4xl text-center text-[var(--text-borders)] mb-8">
                       {selectedComposition.title}
                     </h2>
                     <div
