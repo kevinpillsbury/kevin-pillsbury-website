@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { getSession, updateSession } from "@/lib/session-storage";
 import type { BouncingBlockAssignment } from "@/lib/session-storage";
 
@@ -107,13 +108,13 @@ function resolveElasticAABB(
 
 export default function BouncingScene() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [entityDefs, setEntityDefs] = useState<{ id: string; radius: number }[]>([]);
   const [blockAssignments, setBlockAssignments] = useState<BouncingBlockAssignment[] | null>(null);
   const entitiesRef = useRef<Entity[]>([]);
   const animationRef = useRef<number | null>(null);
   const [isCrabFading, setIsCrabFading] = useState(false);
-  const [isEasterEggOpen, setIsEasterEggOpen] = useState(false);
   const crabClickCountRef = useRef(0);
   const crabClickTimeoutRef = useRef<number | null>(null);
   const crabTeleportTimeoutRef = useRef<number | null>(null);
@@ -338,15 +339,15 @@ export default function BouncingScene() {
   }, [getBounds, boxesOverlap]);
 
   const handleCrabClick = useCallback(() => {
-    // Manage triple-click detection
+    // Manage double-click detection
     if (crabClickTimeoutRef.current !== null) {
       window.clearTimeout(crabClickTimeoutRef.current);
     }
 
     crabClickCountRef.current += 1;
 
-    // Triple click: show easter egg message instead of teleport
-    if (crabClickCountRef.current >= 3) {
+    // Double click: show easter egg message instead of teleport
+    if (crabClickCountRef.current >= 2) {
       crabClickCountRef.current = 0;
       crabClickTimeoutRef.current = null;
 
@@ -356,7 +357,7 @@ export default function BouncingScene() {
       }
 
       setIsCrabFading(false);
-      setIsEasterEggOpen(true);
+      router.push("/secret-page");
       return;
     }
 
@@ -367,7 +368,7 @@ export default function BouncingScene() {
         teleportCrabRandomly();
         setIsCrabFading(false);
         crabTeleportTimeoutRef.current = null;
-      }, 2000);
+      }, 1000);
     }
 
     // Reset click count after a short window
@@ -375,7 +376,7 @@ export default function BouncingScene() {
       crabClickCountRef.current = 0;
       crabClickTimeoutRef.current = null;
     }, 600);
-  }, [isCrabFading, teleportCrabRandomly]);
+  }, [isCrabFading, teleportCrabRandomly, router]);
 
   const crabEntity = entitiesRef.current.find((e) => e.type === "crab");
 
@@ -445,7 +446,7 @@ export default function BouncingScene() {
       {crabEntity && (
         <button
           type="button"
-          className={`absolute rounded-full overflow-hidden transition-opacity duration-2000`}
+          className={`absolute rounded-full overflow-hidden transition-opacity duration-1000`}
           style={{
             left: `var(--${crabEntity.id}-x, 0)`,
             top: `var(--${crabEntity.id}-y, 0)`,
@@ -465,25 +466,6 @@ export default function BouncingScene() {
             draggable={false}
           />
         </button>
-      )}
-
-      {isEasterEggOpen && (
-        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/40">
-          <div className="relative max-w-sm rounded-3xl border border-[var(--text-borders)] bg-[var(--bubbles)] px-6 py-5 shadow-lg">
-            <button
-              type="button"
-              onClick={() => setIsEasterEggOpen(false)}
-              aria-label="Close easter egg"
-              className="absolute right-3 top-3 text-[var(--text-borders)]/80 hover:text-[var(--text-borders)] focus:outline-none"
-            >
-              ×
-            </button>
-            <p className="font-serif text-[var(--text-borders)] text-base leading-relaxed pr-5">
-              You found my easter egg. I don&apos;t know what to do with this yet, but
-              hopefully I have an idea soon.
-            </p>
-          </div>
-        </div>
       )}
     </div>
   );
