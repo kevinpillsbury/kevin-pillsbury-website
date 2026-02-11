@@ -110,7 +110,11 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
                     <h2 className="font-serif text-4xl text-center text-[var(--text-borders)] mb-4">
                       {selectedComposition.title}
                     </h2>
-                    <div className="font-serif text-[var(--text-borders)]/90 text-lg leading-relaxed whitespace-pre-line">
+                    <div
+                      className={`font-serif text-[var(--text-borders)]/90 text-lg leading-relaxed whitespace-pre-line ${
+                        genreSlug === "poetry" ? "text-center" : ""
+                      }`}
+                    >
                       {selectedComposition.content}
                     </div>
                   </>
