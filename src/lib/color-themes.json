@@ -21,6 +21,13 @@
   },
 
   {
+    "name": "E&A 2.0",
+    "background": "#8fadbf",
+    "text-borders": "#000000",
+    "bubbles": "#fab764"
+  },
+
+  {
     "name": "Balkan",
     "background": "#919191",
     "text-borders": "#000000",
