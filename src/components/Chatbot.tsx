@@ -13,7 +13,7 @@ export function MinimizedChatButton({ className }: { className?: string }) {
       type="button"
       onClick={() => setIsMinimized(false)}
       className={[
-        'px-6 py-5 rounded-2xl bg-[var(--bubbles)] border-2 border-[var(--text-borders)]',
+        'px-6 py-5 rounded-2xl bg-[var(--bubbles)] border border-[var(--text-borders)]',
         'text-[var(--text-borders)] font-serif text-lg leading-tight text-center',
         'hover:bg-[var(--bubbles)] focus:outline-none focus:ring-2 focus:ring-[var(--text-borders)]/60',
         'max-w-full w-[280px]',
@@ -59,7 +59,7 @@ export function ChatPanel() {
   );
 
   return (
-    <div className="flex h-full min-h-0 flex-col rounded-[2.25rem] border-2 border-[var(--text-borders)] bg-[var(--bubbles)] overflow-hidden">
+    <div className="flex h-full min-h-0 flex-col rounded-[2.25rem] border border-[var(--text-borders)] bg-[var(--bubbles)] overflow-hidden">
       <div
         ref={listRef}
         className="min-h-0 flex-1 overflow-y-auto px-4 py-4 space-y-4"
@@ -102,7 +102,7 @@ export function ChatPanel() {
       )}
       <form
         onSubmit={handleSubmit}
-        className="shrink-0 flex items-stretch border-t-2 border-[var(--text-borders)] bg-[var(--bubbles)]"
+        className="shrink-0 flex items-stretch border-t border-[var(--text-borders)] bg-[var(--bubbles)]"
       >
         <input
           type="text"
@@ -115,7 +115,7 @@ export function ChatPanel() {
         <button
           type="submit"
           disabled={isLoading || !input.trim()}
-          className="shrink-0 border-l-2 border-[var(--text-borders)] px-5 py-4 font-serif text-2xl text-[var(--text-borders)] hover:bg-[var(--bubbles)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
+          className="shrink-0 border-l border-[var(--text-borders)] px-5 py-4 font-serif text-2xl text-[var(--text-borders)] hover:bg-[var(--bubbles)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
         >
           →
         </button>
