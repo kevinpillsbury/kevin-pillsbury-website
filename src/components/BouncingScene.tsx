@@ -460,7 +460,7 @@ export default function BouncingScene() {
           onClick={handleCrabClick}
         >
           <Image
-            src="/images/cartoon-crab.png"
+            src="/images/terrence-pincher-XIV.png"
             alt="Terrence the crab"
             width={crabEntity.radius * 2}
             height={crabEntity.radius * 2}
