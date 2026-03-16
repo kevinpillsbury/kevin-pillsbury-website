@@ -151,16 +151,21 @@ export default function BouncingScene() {
 
   const computeBioObstacle = useCallback((): RectObstacle | null => {
     if (!containerRef.current) return null;
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const bioEl = containerRef.current.querySelector<HTMLElement>(".home-bio-window");
-    if (!bioEl) return null;
-    const bioRect = bioEl.getBoundingClientRect();
-    return {
-      minX: bioRect.left - containerRect.left,
-      maxX: bioRect.right - containerRect.left,
-      minY: bioRect.top - containerRect.top,
-      maxY: bioRect.bottom - containerRect.top,
-    };
+    const rect = containerRef.current.getBoundingClientRect();
+
+    // Approximate the bio window as a centered card with fixed-ish max width/height
+    const maxBioWidth = Math.min(rect.width - 80, 640); // similar to max-w-xl with side padding
+    const maxBioHeight = Math.min(rect.height - 80, 360);
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const minX = centerX - maxBioWidth / 2;
+    const maxX = centerX + maxBioWidth / 2;
+    const minY = centerY - maxBioHeight / 2;
+    const maxY = centerY + maxBioHeight / 2;
+
+    return { minX, maxX, minY, maxY };
   }, []);
 
   /** AABB overlap: two boxes (centers x,y and x2,y2 with half-sizes r and e.radius) overlap iff both axes overlap. */

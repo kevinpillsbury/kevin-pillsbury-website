@@ -1,16 +1,16 @@
 [
   {
     "name": "Dark",
-    "background": "#414141",
-    "text-borders": "#e7c9a2",
+    "background": "#292929",
+    "text-borders": "#E5E5E5",
     "bubbles": "#5a160c"
   },
 
   {
     "name": "Light",
-    "background": "#CECECE",
-    "text-borders": "#FFFFFF",
-    "bubbles": "#ED9363"
+    "background": "#E5E5E5",
+    "text-borders": "#292929",
+    "bubbles": "#5a160c"
   },
 
   {
