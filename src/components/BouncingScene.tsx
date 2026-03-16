@@ -151,21 +151,16 @@ export default function BouncingScene() {
 
   const computeBioObstacle = useCallback((): RectObstacle | null => {
     if (!containerRef.current) return null;
-    const rect = containerRef.current.getBoundingClientRect();
-
-    // Approximate the bio window as a centered card with fixed-ish max width/height
-    const maxBioWidth = Math.min(rect.width - 80, 640); // similar to max-w-xl with side padding
-    const maxBioHeight = Math.min(rect.height - 80, 360);
-
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-
-    const minX = centerX - maxBioWidth / 2;
-    const maxX = centerX + maxBioWidth / 2;
-    const minY = centerY - maxBioHeight / 2;
-    const maxY = centerY + maxBioHeight / 2;
-
-    return { minX, maxX, minY, maxY };
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const bioEl = typeof document !== "undefined" ? document.querySelector<HTMLElement>(".home-bio-window") : null;
+    if (!bioEl) return null;
+    const bioRect = bioEl.getBoundingClientRect();
+    return {
+      minX: bioRect.left - containerRect.left,
+      maxX: bioRect.right - containerRect.left,
+      minY: bioRect.top - containerRect.top,
+      maxY: bioRect.bottom - containerRect.top,
+    };
   }, []);
 
   /** AABB overlap: two boxes (centers x,y and x2,y2 with half-sizes r and e.radius) overlap iff both axes overlap. */
@@ -330,10 +325,8 @@ export default function BouncingScene() {
       const animate = () => {
         const bounds = getBounds();
         if (!bounds) return;
-        const bio = bioObstacleRef.current ?? computeBioObstacle();
-        if (!bioObstacleRef.current && bio) {
-          bioObstacleRef.current = bio;
-        }
+        const bio = computeBioObstacle();
+        if (bio) bioObstacleRef.current = bio;
 
         const entities = entitiesRef.current;
         const dt = 1;
@@ -417,7 +410,9 @@ export default function BouncingScene() {
       animationRef.current = requestAnimationFrame(animate);
     };
 
-    animationRef.current = requestAnimationFrame(startAnimation);
+    animationRef.current = requestAnimationFrame(() => {
+      requestAnimationFrame(startAnimation);
+    });
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };

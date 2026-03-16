@@ -2,15 +2,15 @@
   {
     "name": "Dark",
     "background": "#292929",
-    "text-borders": "#E5E5E5",
+    "text-borders": "#C0C0C0",
     "bubbles": "#5a160c"
   },
 
   {
     "name": "Light",
-    "background": "#E5E5E5",
+    "background": "#C0C0C0",
     "text-borders": "#292929",
-    "bubbles": "#5a160c"
+    "bubbles": "#994E4E"
   },
 
   {
