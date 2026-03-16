@@ -9,9 +9,9 @@ export default function Home() {
           <BouncingScene />
         </div>
 
-        <div className="relative z-20 flex items-center justify-center min-h-[calc(100vh-8rem)] px-4 sm:px-6 lg:px-8 pointer-events-none">
-          <div className="w-full max-w-xl">
-            <div className="home-bio-window mx-auto rounded-[3.25rem] border border-[var(--text-borders)] bg-[var(--background)] px-8 py-6 sm:px-10 sm:py-8">
+        <div className="relative z-20 flex items-start justify-center min-h-[calc(100vh-8rem)] px-4 sm:px-6 lg:px-8 pointer-events-none">
+          <div className="home-bio-window w-full max-w-xl min-h-[calc(100vh-8rem)] mx-auto border-0 border-y-0 border-l-[6px] border-r-[6px] border-[var(--bubbles)] border-solid flex items-center justify-center">
+            <div className="px-8 py-6 sm:px-10 sm:py-8 w-full max-w-xl">
               <h1 className="text-3xl font-bold tracking-tight text-[var(--text-borders)] sm:text-5xl font-serif text-center">
                 Kevin Pillsbury
               </h1>

@@ -524,7 +524,7 @@ export default function BouncingScene() {
           <Link
             key={def.id}
             href={href}
-            className="absolute rounded-xl cursor-pointer flex items-center justify-center overflow-hidden px-1 no-underline"
+            className="absolute rounded-xl cursor-pointer flex items-center justify-center overflow-hidden px-1 no-underline transition-[filter] duration-150 hover:brightness-110"
             style={blockStyle}
             onClick={() => {
               if (assignment?.id && assignment?.genreSlug) {
@@ -542,7 +542,7 @@ export default function BouncingScene() {
         ) : (
           <div
             key={def.id}
-            className="absolute rounded-xl flex items-center justify-center overflow-hidden px-1"
+            className="absolute rounded-xl flex items-center justify-center overflow-hidden px-1 transition-[filter] duration-150 hover:brightness-110"
             style={blockStyle}
           >
             {content}
@@ -553,7 +553,7 @@ export default function BouncingScene() {
       {crabEntity && (
         <button
           type="button"
-          className={`absolute rounded-full overflow-hidden ${
+          className={`absolute rounded-full overflow-hidden transition-[filter] duration-150 hover:brightness-110 ${
             isCrabFading ? "transition-opacity duration-1000" : ""
           }`}
           style={{

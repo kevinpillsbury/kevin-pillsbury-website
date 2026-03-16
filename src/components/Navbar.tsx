@@ -17,14 +17,14 @@ const Navbar = () => {
             <div className="flex flex-1 items-center gap-3">
               <Link
                 href="/"
-                className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] hover:text-[var(--text-borders)] transition-colors duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
+                className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] transition-colors duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 hover:bg-[color-mix(in_srgb,var(--bubbles)_85%,white)]"
               >
                 Kevin Pillsbury
               </Link>
               <span className="h-6 w-px bg-[var(--text-borders)]/40" />
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
-                  <button className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] hover:text-[var(--text-borders)] transition-colors duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0">
+                  <button className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] transition-colors duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 hover:bg-[color-mix(in_srgb,var(--bubbles)_85%,white)]">
                     <span>Writing</span>
                   </button>
                 </DropdownMenu.Trigger>
@@ -71,7 +71,7 @@ const Navbar = () => {
               <span className="h-6 w-px bg-[var(--text-borders)]/40" />
               <Link
                 href="/rate-your-synopsis"
-                className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] hover:text-[var(--text-borders)] transition-colors duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
+                className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] transition-colors duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 hover:bg-[color-mix(in_srgb,var(--bubbles)_85%,white)]"
                 onClick={(e) => {
                   e.preventDefault();
                   router.push("/rate-your-synopsis");
@@ -82,14 +82,14 @@ const Navbar = () => {
               <span className="h-6 w-px bg-[var(--text-borders)]/40" />
               <Link
                 href="/choose-your-own-adventure-tool"
-                className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] hover:text-[var(--text-borders)] transition-colors duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
+                className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] transition-colors duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 hover:bg-[color-mix(in_srgb,var(--bubbles)_85%,white)]"
               >
                 Choose Your Own Adventure Tool
               </Link>
             </div>
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
-                <button className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] hover:text-[var(--text-borders)] transition-colors duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0">
+                <button className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] transition-colors duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 hover:bg-[color-mix(in_srgb,var(--bubbles)_85%,white)]">
                   <span>Color theme</span>
                 </button>
               </DropdownMenu.Trigger>
