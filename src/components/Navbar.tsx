@@ -10,20 +10,21 @@ const Navbar = () => {
   const router = useRouter();
   const { themes, activeTheme, setActiveThemeByName } = useTheme();
   return (
-    <nav className="sticky top-0 z-[100] bg-[var(--bubbles)] border-b border-[var(--text-borders)]">
+    <nav className="sticky top-0 z-[100] border-b border-[var(--text-borders)]" style={{ backgroundColor: "color-mix(in srgb, var(--bubbles), black 35%)" }}>
       <div className="w-full pl-2 pr-6 sm:pl-2 sm:pr-8 lg:pl-2 lg:pr-10">
         <div className="flex items-center justify-start h-16">
           <div className="flex w-full items-center justify-between">
-            <div className="flex flex-1 items-center gap-2">
+            <div className="flex flex-1 items-center gap-3">
               <Link
                 href="/"
-                className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
+                className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] hover:text-[var(--text-borders)] transition-colors duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
               >
                 Kevin Pillsbury
               </Link>
+              <span className="h-6 w-px bg-[var(--text-borders)]/40" />
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
-                  <button className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0">
+                  <button className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] hover:text-[var(--text-borders)] transition-colors duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0">
                     <span>Writing</span>
                   </button>
                 </DropdownMenu.Trigger>
@@ -67,9 +68,10 @@ const Navbar = () => {
                     </DropdownMenu.Content>
                   </DropdownMenu.Portal>
                 </DropdownMenu.Root>
+              <span className="h-6 w-px bg-[var(--text-borders)]/40" />
               <Link
                 href="/rate-your-synopsis"
-                className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
+                className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] hover:text-[var(--text-borders)] transition-colors duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
                 onClick={(e) => {
                   e.preventDefault();
                   router.push("/rate-your-synopsis");
@@ -77,10 +79,17 @@ const Navbar = () => {
               >
                 Rate your synopsis (Beta)
               </Link>
+              <span className="h-6 w-px bg-[var(--text-borders)]/40" />
+              <Link
+                href="/choose-your-own-adventure-tool"
+                className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] hover:text-[var(--text-borders)] transition-colors duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0"
+              >
+                Choose Your Own Adventure Tool
+              </Link>
             </div>
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
-                <button className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0">
+                <button className="rounded-md px-5 py-2.5 text-base font-medium text-[var(--text-borders)] hover:bg-[var(--bubbles)] hover:text-[var(--text-borders)] transition-colors duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0">
                   <span>Color theme</span>
                 </button>
               </DropdownMenu.Trigger>

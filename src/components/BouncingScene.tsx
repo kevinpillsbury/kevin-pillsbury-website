@@ -13,6 +13,10 @@ const BLOCK_SIZES = [150, 95, 102, 76, 88, 140, 70, 90];
 const BASE_SPEED = 1.5;
 const EDGE_PADDING = 5;
 
+// Central bio window dimensions (must match .home-bio-window in Home layout)
+const BIO_WIDTH_RATIO = 0.6; // 60% of container width
+const BIO_HEIGHT_RATIO = 0.5; // 50% of container height
+
 function shuffle<T>(arr: T[]): T[] {
   const out = [...arr];
   for (let i = out.length - 1; i > 0; i--) {
@@ -43,6 +47,13 @@ function getBoxBounds(e: Entity) {
     maxY: e.y + e.radius,
   };
 }
+
+type RectObstacle = {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+};
 
 /** AABB overlap: returns overlap amounts; both > 0 means collision. */
 function aabbOverlap(
@@ -118,6 +129,7 @@ export default function BouncingScene() {
   const crabClickCountRef = useRef(0);
   const crabClickTimeoutRef = useRef<number | null>(null);
   const crabTeleportTimeoutRef = useRef<number | null>(null);
+  const bioObstacleRef = useRef<RectObstacle | null>(null);
 
   useEffect(() => {
     return () => {
@@ -141,6 +153,20 @@ export default function BouncingScene() {
     };
   }, []);
 
+  const computeBioObstacle = useCallback((): RectObstacle | null => {
+    if (!containerRef.current) return null;
+    const rect = containerRef.current.getBoundingClientRect();
+    const bioWidth = rect.width * BIO_WIDTH_RATIO;
+    const bioHeight = rect.height * BIO_HEIGHT_RATIO;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const minX = centerX - bioWidth / 2;
+    const maxX = centerX + bioWidth / 2;
+    const minY = centerY - bioHeight / 2;
+    const maxY = centerY + bioHeight / 2;
+    return { minX, maxX, minY, maxY };
+  }, []);
+
   /** AABB overlap: two boxes (centers x,y and x2,y2 with half-sizes r and e.radius) overlap iff both axes overlap. */
   const boxesOverlap = useCallback(
     (x: number, y: number, r: number, ex: number, ey: number, er: number) => {
@@ -155,11 +181,14 @@ export default function BouncingScene() {
     const bounds = getBounds();
     if (!bounds) return;
 
+    const bio = computeBioObstacle();
+    bioObstacleRef.current = bio;
+
     const entities: Entity[] = [];
 
-    // Center-spawn spinning crab
+    // Spawn spinning crab slightly above the bio window center
     const centerX = (bounds.minX + bounds.maxX) / 2;
-    const centerY = (bounds.minY + bounds.maxY) / 2;
+    const centerY = (bounds.minY + bounds.maxY) / 2 - (bio ? (bio.maxY - bio.minY) / 2 + CRAB_RADIUS + 16 : 0);
     entities.push({
       id: "crab",
       type: "crab",
@@ -170,33 +199,84 @@ export default function BouncingScene() {
       radius: CRAB_RADIUS,
     });
 
-    // Spawn square blocks without overlapping crab or each other
-    for (let i = 0; i < BLOCK_SIZES.length; i++) {
+    // Spawn square blocks split on left/right of bio window and avoiding overlaps
+    const totalBlocks = BLOCK_SIZES.length;
+    const leftCount = Math.floor(totalBlocks / 2);
+    const rightCount = totalBlocks - leftCount;
+
+    const spawnBlock = (i: number, side: "left" | "right") => {
       const r = BLOCK_SIZES[i];
-      let x: number, y: number;
+      let x: number = 0;
+      let y: number = 0;
       let ok = false;
-      for (let t = 0; t < 50; t++) {
-        x = bounds.minX + r + Math.random() * (bounds.maxX - bounds.minX - 2 * r);
-        y = bounds.minY + r + Math.random() * (bounds.maxY - bounds.minY - 2 * r);
+
+      const horizontalMin =
+        side === "left"
+          ? bounds.minX + r
+          : bio
+          ? bio.maxX + r
+          : bounds.minX + r;
+      const horizontalMax =
+        side === "left"
+          ? (bio ? bio.minX : bounds.maxX) - r
+          : bounds.maxX - r;
+
+      for (let t = 0; t < 60; t++) {
+        x =
+          horizontalMin +
+          Math.random() * Math.max(0, horizontalMax - horizontalMin);
+        y =
+          bounds.minY +
+          r +
+          Math.random() * (bounds.maxY - bounds.minY - 2 * r);
         ok = true;
+
+        // avoid overlapping existing entities
         for (const e of entities) {
-          if (Math.abs(x - e.x) < r + e.radius + 10 && Math.abs(y - e.y) < r + e.radius + 10) {
+          if (
+            Math.abs(x - e.x) < r + e.radius + 10 &&
+            Math.abs(y - e.y) < r + e.radius + 10
+          ) {
             ok = false;
             break;
           }
         }
+
+        // avoid spawning inside bio window
+        if (ok && bio) {
+          const box = {
+            minX: x - r,
+            maxX: x + r,
+            minY: y - r,
+            maxY: y + r,
+          };
+          const { overlapX, overlapY } = aabbOverlap(box, bio);
+          if (overlapX > 0 && overlapY > 0) {
+            ok = false;
+          }
+        }
+
         if (ok) break;
       }
-      if (!ok) continue;
+
+      if (!ok) return;
+
       entities.push({
         id: `block-${i}`,
         type: "block",
-        x: x!,
-        y: y!,
+        x,
+        y,
         vx: BASE_SPEED * (Math.random() * 2 - 1),
         vy: BASE_SPEED * (Math.random() * 2 - 1),
         radius: r,
       });
+    };
+
+    for (let i = 0; i < leftCount; i++) {
+      spawnBlock(i, "left");
+    }
+    for (let i = leftCount; i < totalBlocks; i++) {
+      spawnBlock(i, "right");
     }
 
     entitiesRef.current = entities;
@@ -205,7 +285,7 @@ export default function BouncingScene() {
         .filter((e) => e.type === "block")
         .map((e) => ({ id: e.id, radius: e.radius }))
     );
-  }, [getBounds]);
+  }, [getBounds, computeBioObstacle]);
 
   useEffect(() => {
     const id = requestAnimationFrame(() => setMounted(true));
@@ -249,6 +329,10 @@ export default function BouncingScene() {
       const animate = () => {
         const bounds = getBounds();
         if (!bounds) return;
+        const bio = bioObstacleRef.current ?? computeBioObstacle();
+        if (!bioObstacleRef.current && bio) {
+          bioObstacleRef.current = bio;
+        }
 
         const entities = entitiesRef.current;
         const dt = 1;
@@ -257,6 +341,7 @@ export default function BouncingScene() {
           e.x += e.vx * dt;
           e.y += e.vy * dt;
 
+          // Bounce off container bounds
           if (e.x - e.radius <= bounds.minX) {
             e.x = bounds.minX + e.radius;
             e.vx = Math.abs(e.vx);
@@ -270,6 +355,32 @@ export default function BouncingScene() {
           } else if (e.y + e.radius >= bounds.maxY) {
             e.y = bounds.maxY - e.radius;
             e.vy = -Math.abs(e.vy);
+          }
+
+          // Bounce off central bio window
+          if (bio) {
+            const box = getBoxBounds(e);
+            const { overlapX, overlapY } = aabbOverlap(box, bio);
+            if (overlapX > 0 && overlapY > 0) {
+              // push entity out of the bio rect
+              if (overlapX < overlapY) {
+                if (e.x < (bio.minX + bio.maxX) / 2) {
+                  e.x = bio.minX - e.radius;
+                  e.vx = -Math.abs(e.vx);
+                } else {
+                  e.x = bio.maxX + e.radius;
+                  e.vx = Math.abs(e.vx);
+                }
+              } else {
+                if (e.y < (bio.minY + bio.maxY) / 2) {
+                  e.y = bio.minY - e.radius;
+                  e.vy = -Math.abs(e.vy);
+                } else {
+                  e.y = bio.maxY + e.radius;
+                  e.vy = Math.abs(e.vy);
+                }
+              }
+            }
           }
         }
 
@@ -309,7 +420,7 @@ export default function BouncingScene() {
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [mounted, getBounds, initEntities]);
+  }, [mounted, getBounds, initEntities, computeBioObstacle]);
 
   const teleportCrabRandomly = useCallback(() => {
     const crab = entitiesRef.current.find((e) => e.type === "crab");
