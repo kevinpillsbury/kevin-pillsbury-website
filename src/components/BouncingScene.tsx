@@ -9,13 +9,9 @@ import type { BouncingBlockAssignment } from "@/lib/session-storage";
 
 const CRAB_SIZE = 96;
 const CRAB_RADIUS = CRAB_SIZE / 2;
-const BLOCK_SIZES = [150, 95, 102, 76, 88, 140, 70, 90];
+const BLOCK_SIZES = [112, 72, 77, 57, 66, 105, 52, 68];
 const BASE_SPEED = 1.5;
 const EDGE_PADDING = 5;
-
-// Central bio window dimensions (must match .home-bio-window in Home layout)
-const BIO_WIDTH_RATIO = 0.6; // 60% of container width
-const BIO_HEIGHT_RATIO = 0.5; // 50% of container height
 
 function shuffle<T>(arr: T[]): T[] {
   const out = [...arr];
@@ -155,16 +151,16 @@ export default function BouncingScene() {
 
   const computeBioObstacle = useCallback((): RectObstacle | null => {
     if (!containerRef.current) return null;
-    const rect = containerRef.current.getBoundingClientRect();
-    const bioWidth = rect.width * BIO_WIDTH_RATIO;
-    const bioHeight = rect.height * BIO_HEIGHT_RATIO;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const minX = centerX - bioWidth / 2;
-    const maxX = centerX + bioWidth / 2;
-    const minY = centerY - bioHeight / 2;
-    const maxY = centerY + bioHeight / 2;
-    return { minX, maxX, minY, maxY };
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const bioEl = containerRef.current.querySelector<HTMLElement>(".home-bio-window");
+    if (!bioEl) return null;
+    const bioRect = bioEl.getBoundingClientRect();
+    return {
+      minX: bioRect.left - containerRect.left,
+      maxX: bioRect.right - containerRect.left,
+      minY: bioRect.top - containerRect.top,
+      maxY: bioRect.bottom - containerRect.top,
+    };
   }, []);
 
   /** AABB overlap: two boxes (centers x,y and x2,y2 with half-sizes r and e.radius) overlap iff both axes overlap. */

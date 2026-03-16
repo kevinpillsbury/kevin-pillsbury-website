@@ -1,13 +1,20 @@
 [
   {
     "name": "Dark",
-    "background": "#050505",
+    "background": "#414141",
     "text-borders": "#e7c9a2",
     "bubbles": "#5a160c"
   },
 
   {
     "name": "Light",
+    "background": "#CECECE",
+    "text-borders": "#FFFFFF",
+    "bubbles": "#ED9363"
+  },
+
+  {
+    "name": "Seashore",
     "background": "#faecbe",
     "text-borders": "#000000",
     "bubbles": "#d9faeb"
