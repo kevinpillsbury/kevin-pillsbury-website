@@ -16,7 +16,7 @@ export default function ThemeToggle({ className }: { className?: string }) {
         "rounded-full",
         "w-[56px] h-[24px]",
         "px-1",
-        "flex items-center",
+        "relative flex items-center",
         "transition-[filter] duration-150",
         "select-none",
         className ?? "",
@@ -24,6 +24,9 @@ export default function ThemeToggle({ className }: { className?: string }) {
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       title={isDark ? "Light mode" : "Dark mode"}
     >
+      <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-[10px] text-[rgba(35,35,35,0.85)]">
+        Color Theme
+      </span>
       <span
         className={[
           "h-[18px] w-[18px]",
