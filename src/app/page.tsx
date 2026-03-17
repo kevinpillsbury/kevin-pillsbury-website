@@ -9,7 +9,7 @@ export default function Home() {
       </div>
 
       <div className="relative z-20 w-full px-4 sm:px-6 lg:px-8 pb-16">
-        <section className="pt-6 sm:pt-8 flex flex-col items-center justify-center">
+        <section className="pt-10 sm:pt-12 flex flex-col items-center justify-center">
           <div
             className="relative w-full max-w-5xl md:w-2/3 rounded-[3.5rem] border border-[var(--panel-border)] bg-[var(--panel)] overflow-hidden"
             data-crab-obstacle
@@ -25,7 +25,7 @@ export default function Home() {
               />
             </div>
           </div>
-          <h1 className="mt-6 font-serif text-3xl sm:text-5xl tracking-tight text-[var(--text)] text-center">
+          <h1 className="mt-10 font-serif text-3xl sm:text-5xl tracking-tight text-[var(--text)] text-center">
             Kevin Pillsbury
           </h1>
         </section>
