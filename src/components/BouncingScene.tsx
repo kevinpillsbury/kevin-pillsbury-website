@@ -55,6 +55,7 @@ export default function BouncingScene({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
+  const [hasCrab, setHasCrab] = useState(false);
   const entitiesRef = useRef<Entity[]>([]);
   const animationRef = useRef<number | null>(null);
   const [isCrabFading, setIsCrabFading] = useState(false);
@@ -130,6 +131,7 @@ export default function BouncingScene({
     });
 
     entitiesRef.current = entities;
+    setHasCrab(true);
   }, [getBounds, computeObstacle]);
 
   useEffect(() => {
@@ -295,7 +297,7 @@ export default function BouncingScene({
       ref={containerRef}
       className="absolute inset-0 overflow-hidden pointer-events-none"
     >
-      {crabEntity && (
+      {hasCrab && crabEntity && (
         <button
           type="button"
           className={`absolute rounded-full overflow-hidden pointer-events-auto transition-[filter] duration-150 hover:brightness-110 ${

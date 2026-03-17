@@ -76,8 +76,8 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
                 </h2>
               </div>
 
-              <div className="flex min-h-0 flex-1 items-stretch relative">
-                <ul ref={titlesRef} className="min-h-0 flex-1 overflow-y-auto pr-2 space-y-4">
+              <div className="flex min-h-0 flex-1 items-stretch relative pr-5">
+                <ul ref={titlesRef} className="min-h-0 flex-1 overflow-y-auto pr-6 space-y-4">
                   {compositions.map((composition) => (
                     <li key={composition.id}>
                       <button
@@ -95,7 +95,7 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
                 </ul>
                 {/* Divider: between titles and composition content */}
                 <div
-                  className="hidden md:block absolute right-[-20px] top-1/4 h-1/2 w-px bg-[var(--chat-surface)]"
+                  className="hidden md:block absolute right-0 top-1/4 h-1/2 w-px bg-[var(--chat-surface)]"
                   aria-hidden="true"
                 />
               </div>
