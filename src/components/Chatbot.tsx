@@ -59,7 +59,7 @@ export function ChatPanel() {
   );
 
   return (
-    <div className="flex h-full min-h-0 flex-col rounded-[2.25rem] border border-[var(--text-borders)] bg-[var(--bubbles)] overflow-hidden">
+    <div className="flex h-full min-h-0 flex-col rounded-[2.25rem] border border-[var(--text-borders)] bg-[var(--background)] overflow-hidden">
       <div
         ref={listRef}
         className="min-h-0 flex-1 overflow-y-auto px-4 py-4 space-y-4"
@@ -70,7 +70,7 @@ export function ChatPanel() {
             className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[90%] rounded-2xl px-4 py-3 font-serif text-base border border-[var(--text-borders)] text-[var(--text-borders)] bg-[color-mix(in_srgb,var(--bubbles)_85%,white)]`}
+              className="max-w-[90%] rounded-2xl px-4 py-3 font-serif text-base border border-[var(--text-borders)] text-[var(--text-borders)] bg-[var(--bubbles)]"
             >
               <p className="whitespace-pre-wrap">{m.content}</p>
             </div>
@@ -78,7 +78,7 @@ export function ChatPanel() {
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="max-w-[90%] rounded-2xl border border-[var(--text-borders)] px-4 py-3 font-serif text-base text-[var(--text-borders)] bg-[color-mix(in_srgb,var(--bubbles)_85%,white)]">
+            <div className="max-w-[90%] rounded-2xl border border-[var(--text-borders)] px-4 py-3 font-serif text-base text-[var(--text-borders)] bg-[var(--bubbles)]">
               …
             </div>
           </div>
@@ -98,7 +98,7 @@ export function ChatPanel() {
       )}
       <form
         onSubmit={handleSubmit}
-        className="shrink-0 flex items-stretch border-t border-[var(--text-borders)] bg-[color-mix(in_srgb,var(--bubbles)_85%,white)]"
+        className="shrink-0 flex items-stretch border-t border-[var(--text-borders)] bg-[var(--background)]"
       >
         <input
           type="text"
@@ -111,7 +111,7 @@ export function ChatPanel() {
         <button
           type="submit"
           disabled={isLoading || !input.trim()}
-          className="shrink-0 border-l border-[var(--text-borders)] px-5 py-4 font-serif text-2xl text-[var(--text-borders)] hover:bg-[color-mix(in_srgb,var(--bubbles)_75%,white)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
+          className="shrink-0 border-l border-[var(--text-borders)] px-5 py-4 font-serif text-2xl text-[var(--text-borders)] hover:bg-[var(--bubbles)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
         >
           →
         </button>
