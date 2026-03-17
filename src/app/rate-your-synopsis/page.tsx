@@ -61,7 +61,7 @@ export default function RateYourSynopsisPage() {
       <div className="h-full grid grid-cols-1 gap-6 md:grid-cols-[280px_minmax(0,1fr)_240px] lg:grid-cols-[320px_minmax(0,1fr)_280px] px-4 sm:px-6 lg:px-8 max-w-[1400px] mx-auto w-full min-h-0">
         {/* Left: page description (scrollable only) */}
         <aside className="min-h-0 overflow-y-auto flex flex-col">
-          <div className="text-sm text-[var(--text-borders)]/90 leading-relaxed whitespace-pre-line font-sans pr-2">
+          <div className="text-sm text-[var(--muted-text)] leading-relaxed whitespace-pre-line font-sans pr-2">
             {PAGE_DESCRIPTION}
           </div>
         </aside>
@@ -69,13 +69,13 @@ export default function RateYourSynopsisPage() {
         {/* Center: synopsis input only */}
         <section className="min-h-0 flex flex-col">
           <div className="flex-1 min-h-0 overflow-hidden w-full">
-            <div className="h-full min-h-0 overflow-hidden rounded-[3.25rem] border border-[var(--text-borders)] bg-[var(--bubbles)]">
+            <div className="h-full min-h-0 overflow-hidden rounded-[3.25rem] border border-[var(--panel-border)] bg-[var(--panel)]">
               <div className="h-full min-h-0 overflow-hidden p-6 sm:p-8 flex flex-col">
                 <textarea
                   value={synopsis}
                   onChange={(e) => setSynopsis(e.target.value)}
                   placeholder="Paste or type a book/story synopsis here..."
-                  className="w-full h-full min-h-0 bg-transparent text-[var(--text-borders)] placeholder:text-[var(--text-borders)]/50 placeholder:text-lg font-serif text-lg leading-relaxed resize-none focus:outline-none overflow-y-auto"
+                  className="w-full h-full min-h-0 bg-transparent text-[var(--text)] placeholder:text-[var(--muted-text)] placeholder:text-lg font-serif text-lg leading-relaxed resize-none focus:outline-none overflow-y-auto"
                   disabled={loading}
                 />
               </div>
@@ -86,21 +86,21 @@ export default function RateYourSynopsisPage() {
         {/* Right: rating box + Rate button at bottom left */}
         <aside className="min-h-0 flex flex-col justify-between items-stretch">
           <div className="flex flex-col justify-center flex-1 min-h-0">
-            <div className="rounded-[2rem] border border-[var(--text-borders)] bg-[var(--bubbles)] px-4 py-3 min-w-[200px] w-full">
-              <p className="font-serif text-base text-[var(--text-borders)] whitespace-nowrap">
+            <div className="rounded-[2rem] border border-[var(--panel-border)] bg-[var(--panel)] px-4 py-3 min-w-[200px] w-full">
+              <p className="font-serif text-base text-[var(--text)] whitespace-nowrap">
                 {ratingDisplay}
               </p>
             </div>
           </div>
           <div className="flex flex-col items-start gap-2 flex-shrink-0 pt-4">
             {error && (
-              <p className="text-sm text-[var(--text-borders)]/80">{error}</p>
+              <p className="text-sm text-[var(--muted-text)]">{error}</p>
             )}
             <button
               type="button"
               onClick={handleSubmit}
               disabled={loading || !synopsis.trim()}
-              className="px-6 py-3 rounded-md text-[var(--text-borders)] font-medium bg-[var(--bubbles)] border border-[var(--text-borders)] hover:opacity-90 disabled:opacity-50 focus:outline-none outline-none"
+              className="kpw-ombre-button px-6 py-3 rounded-md font-medium transition-[filter] duration-150 opacity-85 hover:opacity-95 disabled:opacity-50 focus:outline-none outline-none"
             >
               Rate
             </button>

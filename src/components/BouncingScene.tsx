@@ -1,32 +1,18 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { getSession, updateSession } from "@/lib/session-storage";
-import type { BouncingBlockAssignment } from "@/lib/session-storage";
 
 const CRAB_SIZE = 96;
 const CRAB_RADIUS = CRAB_SIZE / 2;
-const BLOCK_SIZES = [112, 72, 77, 57, 66, 105, 52, 68];
 const BASE_SPEED = 1.5;
 const EDGE_PADDING = 5;
-
-function shuffle<T>(arr: T[]): T[] {
-  const out = [...arr];
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [out[i], out[j]] = [out[j], out[i]];
-  }
-  return out;
-}
 
 type Bounds = { minX: number; maxX: number; minY: number; maxY: number };
 
 type Entity = {
   id: string;
-  type: "block" | "crab";
+  type: "crab";
   x: number;
   y: number;
   vx: number;
@@ -62,70 +48,23 @@ function aabbOverlap(
 }
 
 /** Mass proportional to area of square (side = 2*radius). */
-function mass(e: Entity) {
-  return 4 * e.radius * e.radius;
-}
-
-/** Separate two overlapping AABBs along the axis of smallest penetration (push apart by mass ratio). */
-function separateAABB(e1: Entity, e2: Entity, overlapX: number, overlapY: number) {
-  const m1 = mass(e1);
-  const m2 = mass(e2);
-  const totalM = m1 + m2;
-  if (overlapX < overlapY) {
-    const push = overlapX;
-    if (e1.x < e2.x) {
-      e1.x -= (push * m2) / totalM;
-      e2.x += (push * m1) / totalM;
-    } else {
-      e1.x += (push * m2) / totalM;
-      e2.x -= (push * m1) / totalM;
-    }
-  } else {
-    const push = overlapY;
-    if (e1.y < e2.y) {
-      e1.y -= (push * m2) / totalM;
-      e2.y += (push * m1) / totalM;
-    } else {
-      e1.y += (push * m2) / totalM;
-      e2.y -= (push * m1) / totalM;
-    }
-  }
-}
-
-/** Elastic collision response along one axis (1D formula). Normal is +1 or -1 on that axis. */
-function resolveElasticAABB(
-  e1: Entity,
-  e2: Entity,
-  axis: "x" | "y"
-) {
-  const m1 = mass(e1);
-  const m2 = mass(e2);
-  const v1 = axis === "x" ? e1.vx : e1.vy;
-  const v2 = axis === "x" ? e2.vx : e2.vy;
-  const v1New = (v1 * (m1 - m2) + 2 * m2 * v2) / (m1 + m2);
-  const v2New = (v2 * (m2 - m1) + 2 * m1 * v1) / (m1 + m2);
-  if (axis === "x") {
-    e1.vx = v1New;
-    e2.vx = v2New;
-  } else {
-    e1.vy = v1New;
-    e2.vy = v2New;
-  }
-}
-
-export default function BouncingScene() {
+export default function BouncingScene({
+  obstacleSelector,
+}: {
+  obstacleSelector?: string;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  const [entityDefs, setEntityDefs] = useState<{ id: string; radius: number }[]>([]);
-  const [blockAssignments, setBlockAssignments] = useState<BouncingBlockAssignment[] | null>(null);
   const entitiesRef = useRef<Entity[]>([]);
   const animationRef = useRef<number | null>(null);
   const [isCrabFading, setIsCrabFading] = useState(false);
   const crabClickCountRef = useRef(0);
   const crabClickTimeoutRef = useRef<number | null>(null);
   const crabTeleportTimeoutRef = useRef<number | null>(null);
-  const bioObstacleRef = useRef<RectObstacle | null>(null);
+  const obstacleRef = useRef<RectObstacle | null>(null);
+
+  // Default keeps backwards compat for old home layout class name.
+  const resolvedObstacleSelector = obstacleSelector ?? ".home-bio-window";
 
   useEffect(() => {
     return () => {
@@ -149,42 +88,37 @@ export default function BouncingScene() {
     };
   }, []);
 
-  const computeBioObstacle = useCallback((): RectObstacle | null => {
+  const computeObstacle = useCallback((): RectObstacle | null => {
     if (!containerRef.current) return null;
     const containerRect = containerRef.current.getBoundingClientRect();
-    const bioEl = typeof document !== "undefined" ? document.querySelector<HTMLElement>(".home-bio-window") : null;
-    if (!bioEl) return null;
-    const bioRect = bioEl.getBoundingClientRect();
+    const el =
+      typeof document !== "undefined"
+        ? document.querySelector<HTMLElement>(resolvedObstacleSelector)
+        : null;
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
     return {
-      minX: bioRect.left - containerRect.left,
-      maxX: bioRect.right - containerRect.left,
-      minY: bioRect.top - containerRect.top,
-      maxY: bioRect.bottom - containerRect.top,
+      minX: r.left - containerRect.left,
+      maxX: r.right - containerRect.left,
+      minY: r.top - containerRect.top,
+      maxY: r.bottom - containerRect.top,
     };
-  }, []);
-
-  /** AABB overlap: two boxes (centers x,y and x2,y2 with half-sizes r and e.radius) overlap iff both axes overlap. */
-  const boxesOverlap = useCallback(
-    (x: number, y: number, r: number, ex: number, ey: number, er: number) => {
-      return (
-        Math.abs(x - ex) < r + er && Math.abs(y - ey) < r + er
-      );
-    },
-    []
-  );
+  }, [resolvedObstacleSelector]);
 
   const initEntities = useCallback(() => {
     const bounds = getBounds();
     if (!bounds) return;
 
-    const bio = computeBioObstacle();
-    bioObstacleRef.current = bio;
+    const obs = computeObstacle();
+    obstacleRef.current = obs;
 
     const entities: Entity[] = [];
 
-    // Spawn spinning crab slightly above the bio window center
+    // Spawn spinning crab near center, nudged upward if the obstacle exists.
     const centerX = (bounds.minX + bounds.maxX) / 2;
-    const centerY = (bounds.minY + bounds.maxY) / 2 - (bio ? (bio.maxY - bio.minY) / 2 + CRAB_RADIUS + 16 : 0);
+    const centerY =
+      (bounds.minY + bounds.maxY) / 2 -
+      (obs ? (obs.maxY - obs.minY) / 2 + CRAB_RADIUS + 16 : 0);
     entities.push({
       id: "crab",
       type: "crab",
@@ -195,125 +129,13 @@ export default function BouncingScene() {
       radius: CRAB_RADIUS,
     });
 
-    // Spawn square blocks split on left/right of bio window and avoiding overlaps
-    const totalBlocks = BLOCK_SIZES.length;
-    const leftCount = Math.floor(totalBlocks / 2);
-    const rightCount = totalBlocks - leftCount;
-
-    const spawnBlock = (i: number, side: "left" | "right") => {
-      const r = BLOCK_SIZES[i];
-      let x: number = 0;
-      let y: number = 0;
-      let ok = false;
-
-      const horizontalMin =
-        side === "left"
-          ? bounds.minX + r
-          : bio
-          ? bio.maxX + r
-          : bounds.minX + r;
-      const horizontalMax =
-        side === "left"
-          ? (bio ? bio.minX : bounds.maxX) - r
-          : bounds.maxX - r;
-
-      for (let t = 0; t < 60; t++) {
-        x =
-          horizontalMin +
-          Math.random() * Math.max(0, horizontalMax - horizontalMin);
-        y =
-          bounds.minY +
-          r +
-          Math.random() * (bounds.maxY - bounds.minY - 2 * r);
-        ok = true;
-
-        // avoid overlapping existing entities
-        for (const e of entities) {
-          if (
-            Math.abs(x - e.x) < r + e.radius + 10 &&
-            Math.abs(y - e.y) < r + e.radius + 10
-          ) {
-            ok = false;
-            break;
-          }
-        }
-
-        // avoid spawning inside bio window
-        if (ok && bio) {
-          const box = {
-            minX: x - r,
-            maxX: x + r,
-            minY: y - r,
-            maxY: y + r,
-          };
-          const { overlapX, overlapY } = aabbOverlap(box, bio);
-          if (overlapX > 0 && overlapY > 0) {
-            ok = false;
-          }
-        }
-
-        if (ok) break;
-      }
-
-      if (!ok) return;
-
-      entities.push({
-        id: `block-${i}`,
-        type: "block",
-        x,
-        y,
-        vx: BASE_SPEED * (Math.random() * 2 - 1),
-        vy: BASE_SPEED * (Math.random() * 2 - 1),
-        radius: r,
-      });
-    };
-
-    for (let i = 0; i < leftCount; i++) {
-      spawnBlock(i, "left");
-    }
-    for (let i = leftCount; i < totalBlocks; i++) {
-      spawnBlock(i, "right");
-    }
-
     entitiesRef.current = entities;
-    setEntityDefs(
-      entities
-        .filter((e) => e.type === "block")
-        .map((e) => ({ id: e.id, radius: e.radius }))
-    );
-  }, [getBounds, computeBioObstacle]);
+  }, [getBounds, computeObstacle]);
 
   useEffect(() => {
     const id = requestAnimationFrame(() => setMounted(true));
     return () => cancelAnimationFrame(id);
   }, []);
-
-  // Load or assign composition links per block; persist in shared session so it survives navigation but resets on tab close.
-  useEffect(() => {
-    if (!mounted || typeof window === "undefined") return;
-    const N = BLOCK_SIZES.length;
-    const session = getSession();
-    const stored = session.bouncingBlockAssignments;
-    if (Array.isArray(stored) && stored.length === N) {
-      setBlockAssignments(stored);
-      return;
-    }
-    fetch("/api/compositions/titles")
-      .then((res) =>
-        res.ok ? res.json() : Promise.resolve({ compositions: [] as BouncingBlockAssignment[] })
-      )
-      .then((data: { compositions: BouncingBlockAssignment[] }) => {
-        const all = data.compositions ?? [];
-        const shuffled = shuffle(all);
-        const assigned: BouncingBlockAssignment[] = [];
-        for (let i = 0; i < N; i++) {
-          assigned.push(shuffled[i] ?? { id: "", title: "", genreSlug: "" });
-        }
-        updateSession({ bouncingBlockAssignments: assigned });
-        setBlockAssignments(assigned);
-      })
-      .catch(() => setBlockAssignments(Array(N).fill({ id: "", title: "", genreSlug: "" })));
-  }, [mounted]);
 
   useEffect(() => {
     if (!mounted || !containerRef.current) return;
@@ -325,8 +147,8 @@ export default function BouncingScene() {
       const animate = () => {
         const bounds = getBounds();
         if (!bounds) return;
-        const bio = computeBioObstacle();
-        if (bio) bioObstacleRef.current = bio;
+        const obs = computeObstacle();
+        if (obs) obstacleRef.current = obs;
 
         const entities = entitiesRef.current;
         const dt = 1;
@@ -351,44 +173,29 @@ export default function BouncingScene() {
             e.vy = -Math.abs(e.vy);
           }
 
-          // Bounce off central bio window
-          if (bio) {
+          // Bounce off obstacle rectangle (e.g. the home video panel)
+          if (obs) {
             const box = getBoxBounds(e);
-            const { overlapX, overlapY } = aabbOverlap(box, bio);
+            const { overlapX, overlapY } = aabbOverlap(box, obs);
             if (overlapX > 0 && overlapY > 0) {
-              // push entity out of the bio rect
+              // push entity out of obstacle rect
               if (overlapX < overlapY) {
-                if (e.x < (bio.minX + bio.maxX) / 2) {
-                  e.x = bio.minX - e.radius;
+                if (e.x < (obs.minX + obs.maxX) / 2) {
+                  e.x = obs.minX - e.radius;
                   e.vx = -Math.abs(e.vx);
                 } else {
-                  e.x = bio.maxX + e.radius;
+                  e.x = obs.maxX + e.radius;
                   e.vx = Math.abs(e.vx);
                 }
               } else {
-                if (e.y < (bio.minY + bio.maxY) / 2) {
-                  e.y = bio.minY - e.radius;
+                if (e.y < (obs.minY + obs.maxY) / 2) {
+                  e.y = obs.minY - e.radius;
                   e.vy = -Math.abs(e.vy);
                 } else {
-                  e.y = bio.maxY + e.radius;
+                  e.y = obs.maxY + e.radius;
                   e.vy = Math.abs(e.vy);
                 }
               }
-            }
-          }
-        }
-
-        for (let i = 0; i < entities.length; i++) {
-          for (let j = i + 1; j < entities.length; j++) {
-            const e1 = entities[i];
-            const e2 = entities[j];
-            const b1 = getBoxBounds(e1);
-            const b2 = getBoxBounds(e2);
-            const { overlapX, overlapY } = aabbOverlap(b1, b2);
-            if (overlapX > 0 && overlapY > 0) {
-              separateAABB(e1, e2, overlapX, overlapY);
-              const axis: "x" | "y" = overlapX < overlapY ? "x" : "y";
-              resolveElasticAABB(e1, e2, axis);
             }
           }
         }
@@ -416,34 +223,30 @@ export default function BouncingScene() {
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [mounted, getBounds, initEntities, computeBioObstacle]);
+  }, [mounted, getBounds, initEntities, computeObstacle]);
 
   const teleportCrabRandomly = useCallback(() => {
     const crab = entitiesRef.current.find((e) => e.type === "crab");
     if (!crab) return;
     const bounds = getBounds();
     if (!bounds) return;
-    const others = entitiesRef.current.filter((e) => e.id !== crab.id);
     const r = crab.radius;
+    const obs = obstacleRef.current;
     for (let attempt = 0; attempt < 100; attempt++) {
       const x =
         bounds.minX + r + Math.random() * (bounds.maxX - bounds.minX - 2 * r);
       const y =
         bounds.minY + r + Math.random() * (bounds.maxY - bounds.minY - 2 * r);
-      let ok = true;
-      for (const other of others) {
-        if (boxesOverlap(x, y, r, other.x, other.y, other.radius)) {
-          ok = false;
-          break;
-        }
+      if (obs) {
+        const box = { minX: x - r, maxX: x + r, minY: y - r, maxY: y + r };
+        const { overlapX, overlapY } = aabbOverlap(box, obs);
+        if (overlapX > 0 && overlapY > 0) continue;
       }
-      if (ok) {
-        crab.x = x;
-        crab.y = y;
-        break;
-      }
+      crab.x = x;
+      crab.y = y;
+      break;
     }
-  }, [getBounds, boxesOverlap]);
+  }, [getBounds]);
 
   const handleCrabClick = useCallback(() => {
     // Manage double-click detection
@@ -464,7 +267,7 @@ export default function BouncingScene() {
       }
 
       setIsCrabFading(false);
-      router.push("/secret-page");
+      window.location.assign("/secret-page");
       return;
     }
 
@@ -483,77 +286,19 @@ export default function BouncingScene() {
       crabClickCountRef.current = 0;
       crabClickTimeoutRef.current = null;
     }, 600);
-  }, [isCrabFading, teleportCrabRandomly, router]);
+  }, [isCrabFading, teleportCrabRandomly]);
 
   const crabEntity = entitiesRef.current.find((e) => e.type === "crab");
 
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 overflow-hidden"
-      style={{ backgroundColor: "var(--background)" } as React.CSSProperties}
+      className="absolute inset-0 overflow-hidden pointer-events-none"
     >
-      {/* Entities */}
-      {entityDefs.map((def, index) => {
-        const assignment = blockAssignments?.[index];
-        const side = def.radius * 2;
-        const fontSizePx = Math.max(8, Math.min(Math.round(side * 0.15), 20));
-        const href =
-          assignment?.id && assignment?.genreSlug
-            ? `/${assignment.genreSlug}`
-            : null;
-        const blockStyle = {
-          left: `var(--${def.id}-x, 0)` as const,
-          top: `var(--${def.id}-y, 0)` as const,
-          width: side,
-          height: side,
-          backgroundColor: "var(--bubbles)",
-          border: "2px solid var(--text-borders)",
-          transition: "none" as const,
-          color: "var(--text-borders)",
-        };
-        const content = assignment?.title ? (
-          <span
-            className="text-center line-clamp-3 leading-tight"
-            style={{ fontSize: fontSizePx, color: "var(--text-borders)" }}
-          >
-            {assignment.title}
-          </span>
-        ) : null;
-        return href ? (
-          <Link
-            key={def.id}
-            href={href}
-            className="absolute rounded-xl cursor-pointer flex items-center justify-center overflow-hidden px-1 no-underline transition-[filter] duration-150 hover:brightness-110"
-            style={blockStyle}
-            onClick={() => {
-              if (assignment?.id && assignment?.genreSlug) {
-                updateSession({
-                  pendingComposition: {
-                    genreSlug: assignment.genreSlug,
-                    id: assignment.id,
-                  },
-                });
-              }
-            }}
-          >
-            {content}
-          </Link>
-        ) : (
-          <div
-            key={def.id}
-            className="absolute rounded-xl flex items-center justify-center overflow-hidden px-1 transition-[filter] duration-150 hover:brightness-110"
-            style={blockStyle}
-          >
-            {content}
-          </div>
-        );
-      })}
-
       {crabEntity && (
         <button
           type="button"
-          className={`absolute rounded-full overflow-hidden transition-[filter] duration-150 hover:brightness-110 ${
+          className={`absolute rounded-full overflow-hidden pointer-events-auto transition-[filter] duration-150 hover:brightness-110 ${
             isCrabFading ? "transition-opacity duration-1000" : ""
           }`}
           style={{
@@ -561,7 +306,7 @@ export default function BouncingScene() {
             top: `var(--${crabEntity.id}-y, 0)`,
             width: crabEntity.radius * 2,
             height: crabEntity.radius * 2,
-            border: "2px solid var(--text-borders)",
+            border: "2px solid var(--text)",
             opacity: isCrabFading ? 0 : 1,
           }}
           onClick={handleCrabClick}

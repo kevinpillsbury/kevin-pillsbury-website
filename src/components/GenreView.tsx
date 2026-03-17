@@ -49,7 +49,7 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
 
   if (compositions.length === 0) {
     return (
-      <div className="h-full flex items-center justify-center text-center text-[var(--text-borders)] px-6">
+      <div className="h-full flex items-center justify-center text-center text-[var(--text)] px-6">
         <div>
           <p className="text-lg">There are no compositions in this category yet.</p>
         <p className="text-sm mt-2">Check back soon!</p>
@@ -64,13 +64,13 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
         {/* Left column: genre title + compositions list (independently scrollable) */}
         <aside className="min-h-0 overflow-hidden">
           <div className="flex h-full min-h-0 flex-col">
-            <h1 className="font-serif text-5xl lg:text-6xl leading-none text-[var(--text-borders)]">
+            <h1 className="font-serif text-5xl lg:text-6xl leading-none text-[var(--text)]">
               {displayGenre}
             </h1>
 
             <div className="mt-10 flex min-h-0 flex-1 flex-col">
               <div className="mb-4 flex items-center justify-start">
-                <h2 className="text-2xl font-serif text-[var(--text-borders)]">
+                <h2 className="text-2xl font-serif text-[var(--text)]">
                   Compositions:
                 </h2>
               </div>
@@ -83,8 +83,8 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
                         onClick={() => handleSelectComposition(composition.id)}
                         className={`w-full text-left font-serif text-base md:text-lg leading-tight transition-colors ${
                           selectedCompositionId === composition.id
-                            ? 'rounded-md bg-[var(--bubbles)] pl-6 pr-4 py-2 text-[var(--text-borders)]'
-                            : 'pl-4 pr-2 py-2 text-[var(--text-borders)]/90 hover:text-[var(--text-borders)]'
+                            ? 'rounded-md bg-[var(--panel)] pl-6 pr-4 py-2 text-[var(--text)] border border-[var(--panel-border)]'
+                            : 'pl-4 pr-2 py-2 text-[var(--muted-text)] hover:text-[var(--text)]'
                         }`}
                       >
                         {composition.title}
@@ -100,15 +100,15 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
         {/* Center column: composition content (independently scrollable) */}
         <section className="min-h-0 overflow-hidden flex justify-center">
           <div className="w-full max-w-3xl">
-            <div className="h-full min-h-0 overflow-hidden rounded-[3px] border-0 border-y-0 border-l-[6px] border-r-[6px] border-[var(--bubbles)] border-solid bg-[var(--background)]">
+            <div className="h-full min-h-0 overflow-hidden rounded-[3px] border border-[var(--panel-border)] bg-[var(--background)]">
               <div className="h-full min-h-0 overflow-y-auto px-8 py-6 sm:px-10 sm:py-7">
                 {selectedComposition ? (
                   <>
-                    <h2 className="font-serif text-4xl text-center text-[var(--text-borders)] mb-8">
+                    <h2 className="font-serif text-4xl text-center text-[var(--text)] mb-8">
                       {selectedComposition.title}
                     </h2>
                     <div
-                      className={`font-serif text-[var(--text-borders)]/90 text-lg leading-relaxed whitespace-pre-line ${
+                      className={`font-serif text-[var(--muted-text)] text-lg leading-relaxed whitespace-pre-line ${
                         genreSlug === "poetry" ? "text-center" : ""
                       }`}
                     >
@@ -117,7 +117,7 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
                   </>
                 ) : (
                   <div className="h-full min-h-[240px] flex items-start justify-center pt-10">
-                    <p className="font-serif text-lg text-[var(--text-borders)]/50">
+                    <p className="font-serif text-lg text-[var(--muted-text)]">
                       No composition selected.
                     </p>
                   </div>
@@ -133,7 +133,7 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
             <div className="min-h-0 flex-1 flex flex-col">
               <ChatPanel />
             </div>
-            <p className="shrink-0 text-xs text-[var(--text-borders)]/70 leading-snug pt-1">
+            <p className="shrink-0 text-xs text-[var(--muted-text)] leading-snug pt-1">
               Terrence is a RAG (Retrieval-Augmented Generation) giant space crab: he answers by retrieving chunks from my compositions that are semantically similar to your questions. Therefore, there is a positive linear relationship between the quality of his answers and the specificity of your questions.
             </p>
           </div>

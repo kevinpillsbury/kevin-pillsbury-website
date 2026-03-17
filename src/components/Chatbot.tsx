@@ -13,9 +13,9 @@ export function MinimizedChatButton({ className }: { className?: string }) {
       type="button"
       onClick={() => setIsMinimized(false)}
       className={[
-        'px-6 py-5 rounded-2xl bg-[var(--bubbles)] border border-[var(--text-borders)]',
-        'text-[var(--text-borders)] font-serif text-lg leading-tight text-center',
-        'hover:bg-[var(--bubbles)] focus:outline-none focus:ring-2 focus:ring-[var(--text-borders)]/60',
+        'kpw-ombre-button px-6 py-5 rounded-2xl',
+        'font-serif text-lg leading-tight text-center',
+        'opacity-85 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-[var(--nav-border)]/60',
         'max-w-full w-[280px]',
         className ?? '',
       ].join(' ')}
@@ -59,7 +59,7 @@ export function ChatPanel() {
   );
 
   return (
-    <div className="flex h-full min-h-0 flex-col rounded-[2.25rem] border border-[var(--text-borders)] bg-[var(--background)] overflow-hidden">
+    <div className="flex h-full min-h-0 flex-col rounded-[2.25rem] border border-[var(--panel-border)] bg-[var(--background)] overflow-hidden">
       <div
         ref={listRef}
         className="min-h-0 flex-1 overflow-y-auto px-4 py-4 space-y-4"
@@ -70,7 +70,7 @@ export function ChatPanel() {
             className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className="max-w-[90%] rounded-2xl px-4 py-3 font-serif text-base border border-[var(--text-borders)] text-[var(--text-borders)] bg-[var(--bubbles)]"
+              className="max-w-[90%] rounded-2xl px-4 py-3 font-serif text-base border border-[var(--panel-border)] text-[var(--text)] bg-[var(--panel)]"
             >
               <p className="whitespace-pre-wrap">{m.content}</p>
             </div>
@@ -78,7 +78,7 @@ export function ChatPanel() {
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="max-w-[90%] rounded-2xl border border-[var(--text-borders)] px-4 py-3 font-serif text-base text-[var(--text-borders)] bg-[var(--bubbles)]">
+            <div className="max-w-[90%] rounded-2xl border border-[var(--panel-border)] px-4 py-3 font-serif text-base text-[var(--text)] bg-[var(--panel)]">
               …
             </div>
           </div>
@@ -98,20 +98,20 @@ export function ChatPanel() {
       )}
       <form
         onSubmit={handleSubmit}
-        className="shrink-0 flex items-stretch border-t border-[var(--text-borders)] bg-[var(--background)]"
+        className="shrink-0 flex items-stretch border-t border-[var(--panel-border)] bg-[var(--background)]"
       >
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask your questions here!"
-          className="min-w-0 flex-1 bg-transparent px-5 py-4 font-serif text-base text-[var(--text-borders)] placeholder-[var(--text-borders)]/50 focus:outline-none border-0"
+          className="min-w-0 flex-1 bg-transparent px-5 py-4 font-serif text-base text-[var(--text)] placeholder-[var(--muted-text)] focus:outline-none border-0"
           disabled={isLoading}
         />
         <button
           type="submit"
           disabled={isLoading || !input.trim()}
-          className="shrink-0 border-l border-[var(--text-borders)] px-5 py-4 font-serif text-2xl text-[var(--text-borders)] hover:bg-[var(--bubbles)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
+          className="shrink-0 border-l border-[var(--panel-border)] px-5 py-4 font-serif text-2xl text-[var(--text)] hover:bg-[rgba(255,255,255,0.08)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
         >
           →
         </button>

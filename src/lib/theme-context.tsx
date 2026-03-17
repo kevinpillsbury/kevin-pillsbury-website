@@ -1,59 +1,64 @@
 "use client";
 
 import * as React from "react";
-import themesJson from "./color-themes.json";
 
-export type ColorTheme = {
-  name: string;
-  background: string;
-  "text-borders": string;
-  bubbles: string;
-};
-
-const THEMES = themesJson as ColorTheme[];
+export type ThemeMode = "light" | "dark";
 
 type ThemeContextValue = {
-  themes: ColorTheme[];
-  activeTheme: ColorTheme;
-  setActiveThemeByName: (name: string) => void;
+  mode: ThemeMode;
+  setMode: (mode: ThemeMode) => void;
+  toggle: () => void;
 };
 
 const ThemeContext = React.createContext<ThemeContextValue | null>(null);
 
-function applyThemeToDom(theme: ColorTheme) {
+const STORAGE_KEY = "kpw_theme_mode_v1";
+
+function applyModeToDom(mode: ThemeMode) {
   const root = document.documentElement;
-  root.style.setProperty("--background", theme.background);
-  root.style.setProperty("--text-borders", theme["text-borders"]);
-  root.style.setProperty("--bubbles", theme.bubbles);
+  root.classList.toggle("dark", mode === "dark");
+  root.classList.toggle("light", mode === "light");
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const defaultTheme = THEMES[0] ?? {
-    name: "Dark",
-    background: "#050505",
-    "text-borders": "#e7c9a2",
-    bubbles: "#5a160c",
-  };
-
-  const [activeThemeName, setActiveThemeName] = React.useState<string>(
-    defaultTheme.name
-  );
-
-  const activeTheme =
-    THEMES.find((t) => t.name === activeThemeName) ?? defaultTheme;
+  const [mode, setMode] = React.useState<ThemeMode>("dark");
 
   React.useEffect(() => {
-    applyThemeToDom(activeTheme);
-  }, [activeTheme]);
+    if (typeof window === "undefined") return;
+    try {
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      if (stored === "light" || stored === "dark") {
+        setMode(stored);
+        applyModeToDom(stored);
+        return;
+      }
+    } catch {
+      // ignore
+    }
 
-  const setActiveThemeByName = React.useCallback((name: string) => {
-    if (THEMES.some((t) => t.name === name)) setActiveThemeName(name);
+    const prefersDark =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const initial: ThemeMode = prefersDark ? "dark" : "light";
+    setMode(initial);
+    applyModeToDom(initial);
   }, []);
 
-  const value = React.useMemo<ThemeContextValue>(
-    () => ({ themes: THEMES, activeTheme, setActiveThemeByName }),
-    [activeTheme, setActiveThemeByName]
-  );
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    applyModeToDom(mode);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, mode);
+    } catch {
+      // ignore
+    }
+  }, [mode]);
+
+  const toggle = React.useCallback(() => {
+    setMode((m) => (m === "dark" ? "light" : "dark"));
+  }, []);
+
+  const value = React.useMemo<ThemeContextValue>(() => ({ mode, setMode, toggle }), [mode, toggle]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
