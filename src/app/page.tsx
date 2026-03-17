@@ -10,12 +10,12 @@ export default function Home() {
         </div>
 
         <div className="relative z-20 flex items-center justify-center min-h-[calc(100vh-8rem)] px-4 sm:px-6 lg:px-8 pointer-events-none">
-          <div className="home-bio-window w-full max-w-xl mx-auto rounded-[6px] border-0 border-y-0 border-l-[6px] border-r-[6px] border-[var(--bubbles)] border-solid flex items-center justify-center">
+          <div className="home-bio-window w-full max-w-xl mx-auto rounded-[3px] border-0 border-y-0 border-l-[6px] border-r-[6px] border-[var(--bubbles)] border-solid flex items-center justify-center">
             <div className="px-8 py-6 sm:px-10 sm:py-8 w-full max-w-xl">
               <h1 className="text-3xl font-bold tracking-tight text-[var(--text-borders)] sm:text-5xl font-serif text-center">
                 Kevin Pillsbury
               </h1>
-              <ul className="mt-4 text-[var(--text-borders)] text-base sm:text-lg font-serif text-left list-none space-y-4 p-0 m-0">
+              <ul className="mt-8 text-[var(--text-borders)] text-base sm:text-lg font-serif text-left list-none space-y-4 p-0 m-0">
                 {[
                   "If you're interested in me, ask Terrence, he'll meet you on the writing page.",
                   "If you want to check out my writing, tap a block or go to my writing page.",

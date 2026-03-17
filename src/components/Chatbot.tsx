@@ -70,11 +70,7 @@ export function ChatPanel() {
             className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[90%] rounded-2xl px-4 py-3 font-serif text-base border ${
-                m.role === 'user'
-                  ? 'bg-[var(--background)] border-[var(--text-borders)] text-[var(--text-borders)]'
-                  : 'bg-[var(--background)] border-[var(--text-borders)] text-[var(--text-borders)]'
-              }`}
+              className={`max-w-[90%] rounded-2xl px-4 py-3 font-serif text-base border border-[var(--text-borders)] text-[var(--text-borders)] bg-[color-mix(in_srgb,var(--bubbles)_85%,white)]`}
             >
               <p className="whitespace-pre-wrap">{m.content}</p>
             </div>
@@ -82,7 +78,7 @@ export function ChatPanel() {
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="max-w-[90%] rounded-2xl bg-[var(--background)] border border-[var(--text-borders)] px-4 py-3 font-serif text-base text-[var(--text-borders)]">
+            <div className="max-w-[90%] rounded-2xl border border-[var(--text-borders)] px-4 py-3 font-serif text-base text-[var(--text-borders)] bg-[color-mix(in_srgb,var(--bubbles)_85%,white)]">
               …
             </div>
           </div>
@@ -102,20 +98,20 @@ export function ChatPanel() {
       )}
       <form
         onSubmit={handleSubmit}
-        className="shrink-0 flex items-stretch border-t border-[var(--text-borders)] bg-[var(--bubbles)]"
+        className="shrink-0 flex items-stretch border-t border-[var(--text-borders)] bg-[color-mix(in_srgb,var(--bubbles)_85%,white)]"
       >
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask your questions here!"
-          className="min-w-0 flex-1 bg-transparent px-5 py-4 font-serif text-base text-[var(--text-borders)] placeholder-[var(--text-borders)]/50 focus:outline-none"
+          className="min-w-0 flex-1 bg-transparent px-5 py-4 font-serif text-base text-[var(--text-borders)] placeholder-[var(--text-borders)]/50 focus:outline-none border-0"
           disabled={isLoading}
         />
         <button
           type="submit"
           disabled={isLoading || !input.trim()}
-          className="shrink-0 border-l border-[var(--text-borders)] px-5 py-4 font-serif text-2xl text-[var(--text-borders)] hover:bg-[var(--bubbles)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
+          className="shrink-0 border-l border-[var(--text-borders)] px-5 py-4 font-serif text-2xl text-[var(--text-borders)] hover:bg-[color-mix(in_srgb,var(--bubbles)_75%,white)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
         >
           →
         </button>
