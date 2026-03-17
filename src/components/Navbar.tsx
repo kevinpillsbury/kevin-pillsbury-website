@@ -33,7 +33,7 @@ const Navbar = () => {
                       <DropdownMenu.Item asChild>
                         <Link
                           href="/fiction"
-                          className="block px-5 py-3 text-base text-[var(--text)] hover:bg-[rgba(255,255,255,0.08)] focus:outline-none"
+                          className="block px-5 py-3 text-base text-[var(--text)] hover:bg-[var(--accent-soft)] focus:outline-none"
                         >
                           Fiction
                         </Link>
@@ -41,7 +41,7 @@ const Navbar = () => {
                       <DropdownMenu.Item asChild>
                         <Link
                           href="/poetry"
-                          className="block px-5 py-3 text-base text-[var(--text)] hover:bg-[rgba(255,255,255,0.08)] focus:outline-none"
+                          className="block px-5 py-3 text-base text-[var(--text)] hover:bg-[var(--accent-soft)] focus:outline-none"
                         >
                           Poetry
                         </Link>
@@ -49,7 +49,7 @@ const Navbar = () => {
                       <DropdownMenu.Item asChild>
                         <Link
                           href="/essays"
-                          className="block px-5 py-3 text-base text-[var(--text)] hover:bg-[rgba(255,255,255,0.08)] focus:outline-none"
+                          className="block px-5 py-3 text-base text-[var(--text)] hover:bg-[var(--accent-soft)] focus:outline-none"
                         >
                           Essays
                         </Link>
@@ -57,7 +57,7 @@ const Navbar = () => {
                       <DropdownMenu.Item asChild>
                         <Link
                           href="/drama"
-                          className="block px-5 py-3 text-base text-[var(--text)] hover:bg-[rgba(255,255,255,0.08)] focus:outline-none"
+                          className="block px-5 py-3 text-base text-[var(--text)] hover:bg-[var(--accent-soft)] focus:outline-none"
                         >
                           Drama
                         </Link>
