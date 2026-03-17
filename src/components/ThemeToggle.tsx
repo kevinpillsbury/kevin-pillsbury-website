@@ -14,7 +14,7 @@ export default function ThemeToggle({ className }: { className?: string }) {
       className={[
         "kpw-ombre-button",
         "rounded-full",
-        "w-[70px] h-[30px]",
+        "w-[56px] h-[24px]",
         "px-1",
         "flex items-center",
         "transition-[filter] duration-150",
@@ -26,11 +26,11 @@ export default function ThemeToggle({ className }: { className?: string }) {
     >
       <span
         className={[
-          "h-[22px] w-[22px]",
+          "h-[18px] w-[18px]",
           "rounded-full",
           "bg-[rgba(0,0,0,0.75)]",
           "transition-transform duration-200",
-          isDark ? "translate-x-[38px]" : "translate-x-0",
+          isDark ? "translate-x-[30px]" : "translate-x-0",
         ].join(" ")}
       />
     </button>

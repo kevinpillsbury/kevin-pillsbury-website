@@ -62,7 +62,7 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
     <div className="h-full min-h-0 overflow-hidden">
       <div className="grid h-full min-h-0 grid-cols-1 gap-10 md:grid-cols-[240px_minmax(0,1fr)_320px] lg:grid-cols-[260px_minmax(0,1fr)_340px]">
         {/* Left column: genre title + compositions list (independently scrollable) */}
-        <aside className="min-h-0 overflow-hidden">
+        <aside className="min-h-0 overflow-hidden relative">
           <div className="flex h-full min-h-0 flex-col">
             <h1 className="font-serif text-5xl lg:text-6xl leading-none text-[var(--text)]">
               {displayGenre}
@@ -83,7 +83,7 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
                         onClick={() => handleSelectComposition(composition.id)}
                         className={`w-full text-left font-serif text-base md:text-lg leading-tight transition-colors ${
                           selectedCompositionId === composition.id
-                            ? 'rounded-md bg-[var(--panel)] pl-6 pr-4 py-2 text-[var(--text)] border border-[var(--panel-border)]'
+                            ? 'rounded-md bg-[var(--accent-soft)] pl-6 pr-4 py-2 text-[var(--text)] border border-[var(--accent)]'
                             : 'pl-4 pr-2 py-2 text-[var(--muted-text)] hover:text-[var(--text)]'
                         }`}
                       >
@@ -95,12 +95,14 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
               </div>
             </div>
           </div>
+          {/* Decorative divider between list and content */}
+          <div className="hidden md:block absolute top-0 right-[-20px] h-full w-px bg-[var(--accent)] opacity-80" />
         </aside>
 
         {/* Center column: composition content (independently scrollable) */}
         <section className="min-h-0 overflow-hidden flex justify-center">
           <div className="w-full max-w-3xl">
-            <div className="h-full min-h-0 overflow-hidden rounded-[3px] border border-[var(--panel-border)] bg-[var(--background)]">
+            <div className="h-full min-h-0 overflow-hidden rounded-[3px] border-0 bg-[var(--background)]">
               <div className="h-full min-h-0 overflow-y-auto px-8 py-6 sm:px-10 sm:py-7">
                 {selectedComposition ? (
                   <>

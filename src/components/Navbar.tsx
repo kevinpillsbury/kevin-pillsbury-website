@@ -15,13 +15,13 @@ const Navbar = () => {
             <div className="flex flex-1 items-center gap-3 overflow-x-auto">
               <Link
                 href="/"
-                className="kpw-ombre-button rounded-md px-5 py-2.5 text-base font-medium transition-[filter] duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 opacity-85 hover:opacity-95"
+                className="kpw-ombre-button rounded-md px-4 py-2 text-sm font-medium transition-[filter] duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 opacity-75 hover:opacity-90"
               >
                 Home
               </Link>
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
-                  <button className="kpw-ombre-button rounded-md px-5 py-2.5 text-base font-medium transition-[filter] duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 opacity-85 hover:opacity-95">
+                  <button className="kpw-ombre-button rounded-md px-4 py-2 text-sm font-medium transition-[filter] duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 opacity-75 hover:opacity-90">
                     <span>Writing</span>
                   </button>
                 </DropdownMenu.Trigger>
@@ -67,7 +67,7 @@ const Navbar = () => {
                 </DropdownMenu.Root>
               <Link
                 href="/rate-your-synopsis"
-                className="kpw-ombre-button rounded-md px-5 py-2.5 text-base font-medium transition-[filter] duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 opacity-85 hover:opacity-95"
+                className="kpw-ombre-button rounded-md px-4 py-2 text-sm font-medium transition-[filter] duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 opacity-75 hover:opacity-90"
                 onClick={(e) => {
                   e.preventDefault();
                   router.push("/rate-your-synopsis");
@@ -77,7 +77,7 @@ const Navbar = () => {
               </Link>
               <Link
                 href="/choose-your-own-adventure-tool"
-                className="kpw-ombre-button rounded-md px-5 py-2.5 text-base font-medium transition-[filter] duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 opacity-85 hover:opacity-95"
+                className="kpw-ombre-button rounded-md px-4 py-2 text-sm font-medium transition-[filter] duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 opacity-75 hover:opacity-90"
               >
                 Choose Your Own Adventure Tool
               </Link>

@@ -70,7 +70,7 @@ export function ChatPanel() {
             className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className="max-w-[90%] rounded-2xl px-4 py-3 font-serif text-base border border-[var(--panel-border)] text-[var(--text)] bg-[var(--panel)]"
+              className="max-w-[90%] rounded-2xl px-4 py-3 font-serif text-base border border-[var(--panel-border)] text-[var(--text)] bg-[var(--chat-bubble)]"
             >
               <p className="whitespace-pre-wrap">{m.content}</p>
             </div>
@@ -78,7 +78,7 @@ export function ChatPanel() {
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="max-w-[90%] rounded-2xl border border-[var(--panel-border)] px-4 py-3 font-serif text-base text-[var(--text)] bg-[var(--panel)]">
+            <div className="max-w-[90%] rounded-2xl border border-[var(--panel-border)] px-4 py-3 font-serif text-base text-[var(--text)] bg-[var(--chat-bubble)]">
               …
             </div>
           </div>
