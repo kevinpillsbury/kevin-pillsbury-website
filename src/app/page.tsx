@@ -9,7 +9,7 @@ export default function Home() {
       </div>
 
       <div className="relative z-20 w-full px-4 sm:px-6 lg:px-8 pb-16">
-        <section className="pt-10 sm:pt-14 flex items-center justify-center">
+        <section className="pt-6 sm:pt-8 flex flex-col items-center justify-center">
           <div
             className="relative w-full max-w-5xl md:w-2/3 rounded-[3.5rem] border border-[var(--panel-border)] bg-[var(--panel)] overflow-hidden"
             data-crab-obstacle
@@ -23,15 +23,11 @@ export default function Home() {
                 playsInline
                 loop
               />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="rounded-xl border border-[rgba(255,255,255,0.25)] bg-black/55 px-10 py-6 shadow-[0_10px_40px_rgba(0,0,0,0.35)] backdrop-blur-[2px]">
-                  <h1 className="font-serif text-3xl sm:text-5xl tracking-tight text-white text-center">
-                    Kevin Pillsbury
-                  </h1>
-                </div>
-              </div>
             </div>
           </div>
+          <h1 className="mt-6 font-serif text-3xl sm:text-5xl tracking-tight text-[var(--text)] text-center">
+            Kevin Pillsbury
+          </h1>
         </section>
 
         <section className="mx-auto w-full max-w-5xl md:w-2/3 pt-10 sm:pt-12">
