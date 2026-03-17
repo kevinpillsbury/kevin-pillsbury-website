@@ -5,7 +5,7 @@ import Image from "next/image";
 
 const CRAB_SIZE = 96;
 const CRAB_RADIUS = CRAB_SIZE / 2;
-const BASE_SPEED = 1.5;
+const BASE_SPEED = 2.2;
 const EDGE_PADDING = 5;
 
 type Bounds = { minX: number; maxX: number; minY: number; maxY: number };
@@ -106,6 +106,29 @@ export default function BouncingScene({
     };
   }, [resolvedObstacleSelector]);
 
+  const randomSpawnPoint = useCallback(
+    (bounds: Bounds, obs: RectObstacle | null) => {
+      const r = CRAB_RADIUS;
+      for (let attempt = 0; attempt < 200; attempt++) {
+        const x =
+          bounds.minX + r + Math.random() * (bounds.maxX - bounds.minX - 2 * r);
+        const y =
+          bounds.minY + r + Math.random() * (bounds.maxY - bounds.minY - 2 * r);
+        if (obs) {
+          const box = { minX: x - r, maxX: x + r, minY: y - r, maxY: y + r };
+          const { overlapX, overlapY } = aabbOverlap(box, obs);
+          if (overlapX > 0 && overlapY > 0) continue;
+        }
+        return { x, y };
+      }
+      return {
+        x: (bounds.minX + bounds.maxX) / 2,
+        y: (bounds.minY + bounds.maxY) / 2,
+      };
+    },
+    []
+  );
+
   const initEntities = useCallback(() => {
     const bounds = getBounds();
     if (!bounds) return;
@@ -115,11 +138,8 @@ export default function BouncingScene({
 
     const entities: Entity[] = [];
 
-    // Spawn spinning crab near center, nudged upward if the obstacle exists.
-    const centerX = (bounds.minX + bounds.maxX) / 2;
-    const centerY =
-      (bounds.minY + bounds.maxY) / 2 -
-      (obs ? (obs.maxY - obs.minY) / 2 + CRAB_RADIUS + 16 : 0);
+    // Spawn crab randomly (changes each home visit) while avoiding the obstacle.
+    const { x: centerX, y: centerY } = randomSpawnPoint(bounds, obs);
     entities.push({
       id: "crab",
       type: "crab",
@@ -132,7 +152,7 @@ export default function BouncingScene({
 
     entitiesRef.current = entities;
     setHasCrab(true);
-  }, [getBounds, computeObstacle]);
+  }, [getBounds, computeObstacle, randomSpawnPoint]);
 
   useEffect(() => {
     const id = requestAnimationFrame(() => setMounted(true));
@@ -300,7 +320,7 @@ export default function BouncingScene({
       {hasCrab && crabEntity && (
         <button
           type="button"
-          className={`absolute rounded-full overflow-hidden pointer-events-auto transition-[filter] duration-150 hover:brightness-110 ${
+          className={`absolute rounded-full overflow-hidden pointer-events-auto border-2 border-transparent hover:border-[var(--chat-surface)] transition-[filter,border-color] duration-150 hover:brightness-110 ${
             isCrabFading ? "transition-opacity duration-1000" : ""
           }`}
           style={{
@@ -308,7 +328,6 @@ export default function BouncingScene({
             top: `var(--${crabEntity.id}-y, 0)`,
             width: crabEntity.radius * 2,
             height: crabEntity.radius * 2,
-            border: "2px solid var(--text)",
             opacity: isCrabFading ? 0 : 1,
           }}
           onClick={handleCrabClick}

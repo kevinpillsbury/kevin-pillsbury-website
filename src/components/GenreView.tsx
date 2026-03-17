@@ -95,7 +95,7 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
                 </ul>
                 {/* Divider: between titles and composition content */}
                 <div
-                  className="hidden md:block absolute right-0 top-1/4 h-1/2 w-px bg-[var(--chat-surface)]"
+                  className="hidden md:block absolute right-0 top-0 bottom-0 w-[2px] bg-[var(--chat-surface)]"
                   aria-hidden="true"
                 />
               </div>
