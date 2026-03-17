@@ -2,14 +2,14 @@
   {
     "name": "Dark",
     "background": "#292929",
-    "text-borders": "#AEAEAE",
+    "text-borders": "#9E9E9E",
     "bubbles": "#5a160c"
   },
 
   {
     "name": "Light",
     "background": "#AEAEAE",
-    "text-borders": "#1B1B1B",
+    "text-borders": "#0B0B0B",
     "bubbles": "#9A463C"
   },
 

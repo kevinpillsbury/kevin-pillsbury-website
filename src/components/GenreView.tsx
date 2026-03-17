@@ -75,7 +75,7 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
                 </h2>
               </div>
 
-              <div className="flex min-h-0 flex-1 items-stretch gap-6">
+              <div className="flex min-h-0 flex-1 items-stretch">
                 <ul className="min-h-0 flex-1 overflow-y-auto pr-2 space-y-4">
                   {compositions.map((composition) => (
                     <li key={composition.id}>
@@ -92,9 +92,6 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
                     </li>
                   ))}
                 </ul>
-
-                {/* Vertical divider */}
-                <div className="hidden md:block w-px bg-[var(--text-borders)]/70" />
               </div>
             </div>
           </div>
@@ -103,7 +100,7 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
         {/* Center column: composition content (independently scrollable) */}
         <section className="min-h-0 overflow-hidden flex justify-center">
           <div className="w-full max-w-3xl">
-            <div className="h-full min-h-0 overflow-hidden rounded-[3.25rem] border border-[var(--text-borders)] bg-[var(--background)]">
+            <div className="h-full min-h-0 overflow-hidden rounded-[3.25rem] border-0 border-y-0 border-l-[6px] border-r-[6px] border-[var(--bubbles)] border-solid bg-[var(--background)]">
               <div className="h-full min-h-0 overflow-y-auto px-8 py-6 sm:px-10 sm:py-7">
                 {selectedComposition ? (
                   <>
