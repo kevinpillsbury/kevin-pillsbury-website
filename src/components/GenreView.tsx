@@ -100,7 +100,7 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
         {/* Center column: composition content (independently scrollable) */}
         <section className="min-h-0 overflow-hidden flex justify-center">
           <div className="w-full max-w-3xl">
-            <div className="h-full min-h-0 overflow-hidden rounded-[3.25rem] border-0 border-y-0 border-l-[6px] border-r-[6px] border-[var(--bubbles)] border-solid bg-[var(--background)]">
+            <div className="h-full min-h-0 overflow-hidden rounded-[6px] border-0 border-y-0 border-l-[6px] border-r-[6px] border-[var(--bubbles)] border-solid bg-[var(--background)]">
               <div className="h-full min-h-0 overflow-y-auto px-8 py-6 sm:px-10 sm:py-7">
                 {selectedComposition ? (
                   <>
