@@ -36,10 +36,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       // ignore
     }
 
-    const prefersDark =
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const initial: ThemeMode = prefersDark ? "dark" : "light";
+    // Default to dark mode unless the user explicitly chose otherwise.
+    const initial: ThemeMode = "dark";
     setMode(initial);
     applyModeToDom(initial);
   }, []);

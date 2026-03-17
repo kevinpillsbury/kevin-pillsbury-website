@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Composition } from '@prisma/client';
 import { useChat } from '@/lib/chat-context';
 import { ChatPanel } from '@/components/Chatbot';
@@ -15,6 +15,8 @@ type GenreViewProps = {
 export default function GenreView({ compositions, displayGenre, genreSlug }: GenreViewProps) {
   const { setCurrentContext } = useChat();
   const [selectedCompositionId, setSelectedCompositionId] = useState<string | null>(null);
+  const titlesRef = useRef<HTMLUListElement | null>(null);
+  const [dividerHeight, setDividerHeight] = useState<number>(0);
 
   // Open with a composition pre-selected when linked from home page.
   useEffect(() => {
@@ -47,6 +49,20 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
     }
   };
 
+  useLayoutEffect(() => {
+    const el = titlesRef.current;
+    if (!el) return;
+    const update = () => setDividerHeight(el.scrollHeight);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    window.addEventListener('resize', update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', update);
+    };
+  }, [compositions.length]);
+
   if (compositions.length === 0) {
     return (
       <div className="h-full flex items-center justify-center text-center text-[var(--text)] px-6">
@@ -75,8 +91,8 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
                 </h2>
               </div>
 
-              <div className="flex min-h-0 flex-1 items-stretch">
-                <ul className="min-h-0 flex-1 overflow-y-auto pr-2 space-y-4">
+              <div className="flex min-h-0 flex-1 items-stretch relative">
+                <ul ref={titlesRef} className="min-h-0 flex-1 overflow-y-auto pr-2 space-y-4">
                   {compositions.map((composition) => (
                     <li key={composition.id}>
                       <button
@@ -92,11 +108,15 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
                     </li>
                   ))}
                 </ul>
+                {/* Gray divider: as tall as the titles content */}
+                <div
+                  className="hidden md:block absolute right-[-20px] top-0 w-px bg-[rgba(160,160,160,0.75)]"
+                  style={{ height: dividerHeight ? `${dividerHeight}px` : '100%' }}
+                  aria-hidden="true"
+                />
               </div>
             </div>
           </div>
-          {/* Decorative divider between list and content */}
-          <div className="hidden md:block absolute top-0 right-[-20px] h-full w-px bg-[var(--accent)] opacity-80" />
         </aside>
 
         {/* Center column: composition content (independently scrollable) */}

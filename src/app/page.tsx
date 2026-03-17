@@ -11,7 +11,7 @@ export default function Home() {
       <div className="relative z-20 w-full px-4 sm:px-6 lg:px-8 pb-16">
         <section className="pt-10 sm:pt-14 flex items-center justify-center">
           <div
-            className="relative w-full max-w-5xl md:w-3/4 rounded-[3.5rem] border border-[var(--panel-border)] bg-[var(--panel)] overflow-hidden"
+            className="relative w-full max-w-5xl md:w-2/3 rounded-[3.5rem] border border-[var(--panel-border)] bg-[var(--panel)] overflow-hidden"
             data-crab-obstacle
           >
             <div className="relative aspect-[16/7] sm:aspect-[16/6]">
@@ -34,7 +34,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="mx-auto w-full max-w-5xl md:w-3/4 pt-10 sm:pt-12">
+        <section className="mx-auto w-full max-w-5xl md:w-2/3 pt-10 sm:pt-12">
           <h2 className="font-serif text-4xl sm:text-5xl text-[var(--text)]">
             About
           </h2>

@@ -22,6 +22,7 @@
   --accent: rgba(145, 182, 230, 0.95);
   --accent-soft: rgba(145, 182, 230, 0.28);
   --chat-bubble: rgba(145, 182, 230, 0.38);
+  --chat-surface: rgba(120, 120, 120, 0.42);
 
   --menu-surface: rgba(210, 210, 210, 0.86);
   --menu-border: rgba(0, 0, 0, 0.55);
@@ -44,11 +45,12 @@ html.dark {
   --button-text: #0b0b0b;
   --button-border: rgba(0, 0, 0, 0.55);
   /* Dark-mode ombré: lighter + more transparent */
-  --button-grad-a: rgba(255, 145, 85, 0.52);
-  --button-grad-b: rgba(190, 92, 42, 0.52);
+  --button-grad-a: rgba(255, 175, 125, 0.56);
+  --button-grad-b: rgba(225, 125, 75, 0.56);
   --accent: rgba(255, 145, 85, 0.9);
   --accent-soft: rgba(255, 145, 85, 0.22);
-  --chat-bubble: var(--panel);
+  --chat-bubble: rgba(225, 125, 75, 0.36);
+  --chat-surface: rgba(35, 35, 35, 0.92);
 
   --menu-surface: rgba(0, 0, 0, 0.72);
   --menu-border: rgba(255, 255, 255, 0.28);

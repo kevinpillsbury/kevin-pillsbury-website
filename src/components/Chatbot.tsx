@@ -59,7 +59,7 @@ export function ChatPanel() {
   );
 
   return (
-    <div className="flex h-full min-h-0 flex-col rounded-[2.25rem] border border-[var(--panel-border)] bg-[var(--background)] overflow-hidden">
+    <div className="flex h-full min-h-0 flex-col rounded-[2.25rem] border border-[var(--panel-border)] bg-[var(--chat-surface)] overflow-hidden">
       <div
         ref={listRef}
         className="min-h-0 flex-1 overflow-y-auto px-4 py-4 space-y-4"
@@ -98,7 +98,7 @@ export function ChatPanel() {
       )}
       <form
         onSubmit={handleSubmit}
-        className="shrink-0 flex items-stretch border-t border-[var(--panel-border)] bg-[var(--background)]"
+        className="shrink-0 flex items-stretch border-t border-[var(--panel-border)] bg-[var(--chat-surface)]"
       >
         <input
           type="text"
