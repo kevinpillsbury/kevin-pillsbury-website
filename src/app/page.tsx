@@ -35,7 +35,7 @@ export default function Home() {
         </section>
 
         <section className="mx-auto w-full max-w-5xl md:w-2/3 pt-10 sm:pt-12">
-          <h2 className="font-serif text-4xl sm:text-5xl text-[var(--text)]">
+          <h2 className="font-serif text-3xl sm:text-4xl text-[var(--text)]">
             About
           </h2>
           <div className="mt-4 max-w-3xl font-serif text-sm sm:text-base leading-relaxed text-[var(--muted-text)] space-y-4">
@@ -43,7 +43,7 @@ export default function Home() {
             <p>Check out my writing.</p>
           </div>
 
-          <h2 className="mt-10 font-serif text-4xl sm:text-5xl text-[var(--text)]">
+          <h2 className="mt-10 font-serif text-3xl sm:text-4xl text-[var(--text)]">
             Projects
           </h2>
           <div className="mt-4 max-w-3xl font-serif text-sm sm:text-base leading-relaxed text-[var(--muted-text)] space-y-4">

@@ -15,13 +15,13 @@
   --nav-border: rgba(20, 20, 20, 0.55);
 
   --button-text: #0b0b0b;
-  --button-border: rgba(0, 0, 0, 0.55);
-  /* Buttons: more transparent + smaller */
-  --button-grad-a: rgba(198, 220, 255, 0.55);
-  --button-grad-b: rgba(145, 182, 230, 0.55);
-  --accent: rgba(145, 182, 230, 0.95);
-  --accent-soft: rgba(145, 182, 230, 0.28);
-  --chat-bubble: rgba(145, 182, 230, 0.38);
+  --button-border: rgba(255, 130, 45, 0.55);
+  /* Buttons: lighter + more saturated orange, transparent */
+  --button-grad-a: rgba(255, 190, 120, 0.25);
+  --button-grad-b: rgba(255, 120, 40, 0.25);
+  --accent: rgba(255, 130, 45, 0.9);
+  --accent-soft: rgba(255, 130, 45, 0.18);
+  --chat-bubble: rgba(255, 150, 75, 0.24);
   --chat-surface: rgba(120, 120, 120, 0.42);
 
   --menu-surface: rgba(210, 210, 210, 0.86);
@@ -43,13 +43,13 @@ html.dark {
   --nav-border: rgba(255, 255, 255, 0.28);
 
   --button-text: #0b0b0b;
-  --button-border: rgba(0, 0, 0, 0.55);
-  /* Dark-mode ombré: lighter + more transparent */
-  --button-grad-a: rgba(255, 190, 120, 0.78);
-  --button-grad-b: rgba(255, 115, 35, 0.78);
-  --accent: rgba(255, 145, 85, 0.9);
-  --accent-soft: rgba(255, 145, 85, 0.22);
-  --chat-bubble: rgba(225, 125, 75, 0.36);
+  --button-border: rgba(255, 150, 75, 0.62);
+  /* Dark-mode ombré: lighter + more saturated orange, still transparent */
+  --button-grad-a: rgba(255, 190, 120, 0.34);
+  --button-grad-b: rgba(255, 115, 35, 0.34);
+  --accent: rgba(255, 150, 75, 0.92);
+  --accent-soft: rgba(255, 150, 75, 0.22);
+  --chat-bubble: rgba(255, 150, 75, 0.28);
   --chat-surface: rgba(35, 35, 35, 0.92);
 
   --menu-surface: rgba(0, 0, 0, 0.72);

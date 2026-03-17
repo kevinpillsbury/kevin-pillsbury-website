@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Composition } from '@prisma/client';
 import { useChat } from '@/lib/chat-context';
 import { ChatPanel } from '@/components/Chatbot';
@@ -16,7 +16,6 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
   const { setCurrentContext } = useChat();
   const [selectedCompositionId, setSelectedCompositionId] = useState<string | null>(null);
   const titlesRef = useRef<HTMLUListElement | null>(null);
-  const [dividerHeight, setDividerHeight] = useState<number>(0);
 
   // Open with a composition pre-selected when linked from home page.
   useEffect(() => {
@@ -48,20 +47,6 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
       setSelectedCompositionId(id);
     }
   };
-
-  useLayoutEffect(() => {
-    const el = titlesRef.current;
-    if (!el) return;
-    const update = () => setDividerHeight(el.scrollHeight);
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    window.addEventListener('resize', update);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener('resize', update);
-    };
-  }, [compositions.length]);
 
   if (compositions.length === 0) {
     return (
@@ -108,10 +93,9 @@ export default function GenreView({ compositions, displayGenre, genreSlug }: Gen
                     </li>
                   ))}
                 </ul>
-                {/* Divider (old behavior): sized to the titles content */}
+                {/* Divider: between titles and composition content */}
                 <div
-                  className="hidden md:block absolute right-[-20px] top-0 w-px bg-[rgba(160,160,160,0.75)]"
-                  style={{ height: dividerHeight ? `${dividerHeight}px` : '100%' }}
+                  className="hidden md:block absolute right-[-20px] top-1/4 h-1/2 w-px bg-[var(--chat-surface)]"
                   aria-hidden="true"
                 />
               </div>

@@ -8,20 +8,20 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 const Navbar = () => {
   const router = useRouter();
   return (
-    <nav className="sticky top-0 z-[100] border-b border-[var(--nav-border)] bg-[var(--nav-surface)] backdrop-blur-md">
+    <nav className="sticky top-0 z-[100] bg-transparent">
       <div className="w-full pl-2 pr-2 sm:pl-2 sm:pr-4 lg:pl-2 lg:pr-6">
         <div className="flex items-center justify-start h-16">
           <div className="flex w-full items-center justify-between">
             <div className="flex flex-1 items-center gap-3 overflow-x-auto">
               <Link
                 href="/"
-                className="kpw-ombre-button rounded-md px-4 py-2 text-sm font-medium transition-[filter] duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 opacity-75 hover:opacity-90"
+                className="kpw-ombre-button rounded-lg px-4 py-2 text-sm font-medium transition-[filter] duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 opacity-75 hover:opacity-90"
               >
                 Home
               </Link>
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
-                  <button className="kpw-ombre-button rounded-md px-4 py-2 text-sm font-medium transition-[filter] duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 opacity-75 hover:opacity-90">
+                  <button className="kpw-ombre-button rounded-lg px-4 py-2 text-sm font-medium transition-[filter] duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 opacity-75 hover:opacity-90">
                     <span>Writing</span>
                   </button>
                 </DropdownMenu.Trigger>
@@ -67,7 +67,7 @@ const Navbar = () => {
                 </DropdownMenu.Root>
               <Link
                 href="/rate-your-synopsis"
-                className="kpw-ombre-button rounded-md px-4 py-2 text-sm font-medium transition-[filter] duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 opacity-75 hover:opacity-90"
+                className="kpw-ombre-button rounded-lg px-4 py-2 text-sm font-medium transition-[filter] duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 opacity-75 hover:opacity-90"
                 onClick={(e) => {
                   e.preventDefault();
                   router.push("/rate-your-synopsis");
@@ -77,7 +77,7 @@ const Navbar = () => {
               </Link>
               <Link
                 href="/choose-your-own-adventure-tool"
-                className="kpw-ombre-button rounded-md px-4 py-2 text-sm font-medium transition-[filter] duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 opacity-75 hover:opacity-90"
+                className="kpw-ombre-button rounded-lg px-4 py-2 text-sm font-medium transition-[filter] duration-150 focus:outline-none focus-visible:outline-none outline-none ring-0 focus:ring-0 opacity-75 hover:opacity-90"
               >
                 Choose Your Own Adventure Tool
               </Link>
